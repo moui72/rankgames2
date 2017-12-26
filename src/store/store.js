@@ -1,8 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
+
 Vue.use(Vuex);
 
 const state = {
+  lastRequest: '',
   games: [
     {
       name: 'Concordia',
@@ -38,17 +41,31 @@ const getters = {
 };
 
 const actions = {
-  getCollection({ commit }) {
+  getCollection({ commit }, { username }) {
     return new Promise((resolve, reject) => {
-      Vue.http
+      if (!username.length) {
+        reject({ error: { message: 'No username provided.' } });
+      }
+      let request = 'http://rankgames.ty-pe.com/bggapi/?username=' + username;
+      axios
         .get(request)
         .then(response => {
+          console.log('response');
+          console.log(response);
+          let data = response.data;
           // @TODO check for and handle 202 status before commit & resolve
-          commit('importCollection', response.body);
-          resolve(response);
+          if (data.status == 202) {
+            return reject(data.message);
+          }
+          if (data.error) {
+            return reject(data.error.message);
+          }
+          commit('importCollection', data);
+          return resolve(response);
         })
         .catch(error => {
-          reject(error);
+          console.log(error);
+          return reject(error.message);
         });
     });
   }
@@ -56,7 +73,7 @@ const actions = {
 
 const mutations = {
   importCollection(state, collection) {
-    console.log(data);
+    console.log(collection);
   },
   toggle(state, payload) {
     payload.game.props.toggleable[payload.property] = payload.value;

@@ -18,7 +18,7 @@ import 'vue-awesome/icons/toggle-off';
 
 import Icon from 'vue-awesome';
 import { mapMutations } from 'vuex';
-console.log(mapMutations);
+
 export default {
   name: 'PropButton',
   props: { property: String, value: Boolean, game: Object, index: Number },

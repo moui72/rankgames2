@@ -9,11 +9,13 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "bootstrap": "^4.0.0-beta.2",
     "bootstrap-vue": "^1.2.0",
     "popper.js": "^1.12.9",
     "vue": "^2.5.3",
     "vue-awesome": "^2.3.4",
+    "vue-simple-spinner": "^1.2.8",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

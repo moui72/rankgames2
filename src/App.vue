@@ -2,16 +2,20 @@
   <div id="app">
     <img src="./assets/logo.png">
     <h1>{{ title }}</h1>
+    <import></import>
     <lib></lib>
   </div>
 </template>
 
 <script>
 import Lib from './components/library.vue';
+import Import from './components/import.vue';
+
 export default {
   name: 'app',
   components: {
-    Lib
+    Lib,
+    Import
   },
   data() {
     return {
