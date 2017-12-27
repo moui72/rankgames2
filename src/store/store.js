@@ -1,31 +1,17 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import _ from 'lodash';
 
 Vue.use(Vuex);
 
 const state = {
-  lastRequest: '',
-  games: [
-    {
-      name: 'Concordia',
-      props: {
-        toggleable: {
-          visible: true,
-          rankable: true
-        }
-      }
-    },
-    {
-      name: 'Alien Frontiers',
-      props: {
-        toggleable: {
-          visible: true,
-          rankable: true
-        }
-      }
-    }
-  ]
+  settings: {
+    merge: false
+  },
+  requests: [],
+  games: [],
+  preImportGames: []
 };
 
 const getters = {
@@ -37,6 +23,15 @@ const getters = {
   },
   rankableGames: state => {
     return state.games.filter(game => game.props.toggleable.rankable);
+  },
+  preImportGames: state => {
+    return state.preImportGames;
+  },
+  newGames: state => {
+    return _.difference(state.preImportGames, state.games);
+  },
+  droppedGames: state => {
+    return _.difference(state.games, state.preImportGames);
   }
 };
 
@@ -47,6 +42,7 @@ const actions = {
         reject({ error: { message: 'No username provided.' } });
       }
       let request = 'http://rankgames.ty-pe.com/bggapi/?username=' + username;
+      this.state.requests.push(request);
       axios
         .get(request)
         .then(response => {
@@ -73,11 +69,33 @@ const actions = {
 
 const mutations = {
   importCollection(state, collection) {
-    console.log(collection);
+    let prepdCollection = _.map(collection, game => {
+      return {
+        name: game.name,
+        properties: {
+          toggleable: {
+            visible: true,
+            rankable: true
+          },
+          bgg: { ...game }
+        }
+      };
+    });
+    state.preImportGames = prepdCollection;
   },
+  /**
+   * Mutates the value of a game's toggleable property
+   * (game.properties.toggleable...)
+   * @param  {Object} state   [description]
+   * @param  {Object} payload Has properties index (game's index in
+   *                          state.games array), property (name of the
+   *                          toggleable property to mutate) and value (new
+   *                          value for mutated property)
+   * @return {Void}           No return statement.
+   */
   toggle(state, payload) {
-    payload.game.props.toggleable[payload.property] = payload.value;
-    state.games[payload.index] = payload.game;
+    state.games[payload.index].properties.toggleable[payload.property] =
+      payload.value;
   }
 };
 

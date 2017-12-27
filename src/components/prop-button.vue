@@ -3,7 +3,6 @@
     @click="toggle({
       property: property,
       value: !value,
-      game: game,
       index: index
     })">
     <icon :name="icon"></icon>
@@ -21,7 +20,7 @@ import { mapMutations } from 'vuex';
 
 export default {
   name: 'PropButton',
-  props: { property: String, value: Boolean, game: Object, index: Number },
+  props: { property: String, value: Boolean, index: Number },
   components: { Icon },
   data() {
     return {

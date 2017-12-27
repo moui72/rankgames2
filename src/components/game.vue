@@ -1,16 +1,15 @@
 <template>
   <div class="one-game">
     <div class="header">
-      <h3>{{index}}. {{game.name}}</h3>
+      <h3>{{name}}</h3>
       <div class="controls">
       </div>
     </div>
     <div class="body">
-      <p v-for="(v, p) in game.props.toggleable">
+      <p v-for="(v, p) in toggleables">
         <prop-button
           :property="p"
           :value="v"
-          :game="game"
           :index="index">
         </prop-button>
       </p>
@@ -27,7 +26,7 @@ import PropButton from './prop-button.vue';
 export default {
   name: 'Game',
   // declare the props
-  props: { game: Object, index: Number },
+  props: { toggleables: Object, index: Number, name: String },
   // the prop can be used inside templates, and will also
   // be set as `this.msg`
   data() {
