@@ -6,11 +6,11 @@
       </div>
     </div>
     <div class="body">
-      <p v-for="(v, p) in toggleables">
+      <p v-for="(v, p) in toggles(id)">
         <prop-button
           :property="p"
           :value="v"
-          :index="index">
+          :id="id">
         </prop-button>
       </p>
     </div>
@@ -22,13 +22,11 @@
 </template>
 <script>
 import PropButton from './prop-button.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'Game',
-  // declare the props
-  props: { toggleables: Object, index: Number, name: String },
-  // the prop can be used inside templates, and will also
-  // be set as `this.msg`
+  props: { id: Number, name: String },
   data() {
     return {};
   },
@@ -36,9 +34,7 @@ export default {
     PropButton
   },
   computed: {
-    id() {
-      return this.game.id;
-    }
+    ...mapGetters(['toggles'])
   }
 };
 </script>

@@ -4,10 +4,8 @@
     <ul v-if="games.length">
       <li v-for="(game, index) in games">
         <game
-        :name="game.name"
-          :toggleables="game.properties.toggleable"
-          :index="index"
-          @toggle="toggle($event, game)">
+          :id="game.gameId"
+          :name="game.name">
         </game>
       </li>
     </ul>

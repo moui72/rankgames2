@@ -11,7 +11,8 @@ const state = {
   },
   requests: [],
   games: [],
-  preImportGames: []
+  preImportGames: [],
+  toggleables: ['visible', 'rankable']
 };
 
 const getters = {
@@ -28,10 +29,20 @@ const getters = {
     return state.preImportGames;
   },
   newGames: state => {
-    return _.difference(state.preImportGames, state.games);
+    return _.differenceBy(state.preImportGames, state.games, 'gameId');
   },
   droppedGames: state => {
-    return _.difference(state.games, state.preImportGames);
+    return _.differenceBy(state.games, state.preImportGames, 'gameId');
+  },
+  toggles: state => id => {
+    let g = _.find(state.games, game => {
+      return game.gameId == id;
+    });
+    let obj = {};
+    _.forEach(state.toggleables, p => {
+      obj[p] = g[p];
+    });
+    return obj;
   }
 };
 
@@ -39,17 +50,14 @@ const actions = {
   getCollection({ commit }, { username }) {
     return new Promise((resolve, reject) => {
       if (!username.length) {
-        reject({ error: { message: 'No username provided.' } });
+        reject('No username provided.');
       }
       let request = 'http://rankgames.ty-pe.com/bggapi/?username=' + username;
       this.state.requests.push(request);
       axios
         .get(request)
         .then(response => {
-          console.log('response');
-          console.log(response);
           let data = response.data;
-          // @TODO check for and handle 202 status before commit & resolve
           if (data.status == 202) {
             return reject(data.message);
           }
@@ -60,7 +68,6 @@ const actions = {
           return resolve(response);
         })
         .catch(error => {
-          console.log(error);
           return reject(error.message);
         });
     });
@@ -68,20 +75,37 @@ const actions = {
 };
 
 const mutations = {
+  /**
+   * Processes data from server, shapes it for this app's use, and insert it
+   * into state as preImportGames (does not change state.games)
+   * @param  {Object}   state       app state
+   * @param  {Object[]} collection  game collection from server
+   * @return {void}                 no return value
+   */
+  importMerge(state) {
+    let newSet = _.unionBy(
+      this.state.games,
+      this.state.preImportGames,
+      'gameId'
+    );
+    state.games = newSet;
+  },
+  importReplace() {},
+  importCancel() {},
   importCollection(state, collection) {
+    let toggleables = {};
+    // this.state.toggleables: string[] (property names)
+    _.forEach(this.state.toggleables, p => {
+      toggleables[p] = true;
+    });
     let prepdCollection = _.map(collection, game => {
       return {
-        name: game.name,
-        properties: {
-          toggleable: {
-            visible: true,
-            rankable: true
-          },
-          bgg: { ...game }
-        }
+        ...toggleables,
+        ...game
       };
     });
     state.preImportGames = prepdCollection;
+    console.log(prepdCollection);
   },
   /**
    * Mutates the value of a game's toggleable property
@@ -94,8 +118,19 @@ const mutations = {
    * @return {Void}           No return statement.
    */
   toggle(state, payload) {
-    state.games[payload.index].properties.toggleable[payload.property] =
+    _.find(state.games, game => {
+      return game.gameId == payload.id;
+    })[payload.property] =
       payload.value;
+    /*
+    is the following better than the above?
+    state.games[
+      _.findIndex(state.games, g => {
+        return g.gameId == payload.id;
+      })
+    ][payload.property] =
+      payload.value;
+    */
   }
 };
 

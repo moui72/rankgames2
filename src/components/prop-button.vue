@@ -3,7 +3,7 @@
     @click="toggle({
       property: property,
       value: !value,
-      index: index
+      id: id
     })">
     <icon :name="icon"></icon>
     <span class="sr-only">set {{property}} to {{!value}}</span>
@@ -16,11 +16,11 @@ import 'vue-awesome/icons/toggle-on';
 import 'vue-awesome/icons/toggle-off';
 
 import Icon from 'vue-awesome';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapGetters } from 'vuex';
 
 export default {
   name: 'PropButton',
-  props: { property: String, value: Boolean, index: Number },
+  props: { property: String, value: Boolean, id: Number },
   components: { Icon },
   data() {
     return {

@@ -37,7 +37,7 @@
         </p>
         <b-button @click="importMerge()" variant="info">Merge</b-button>
         <b-button @click="importReplace()" variant="danger">Replace</b-button>
-        <b-button @click="cancelImport()" variant="warning">Cancel</b-button>
+        <b-button @click="importCancel()" variant="warning">Cancel</b-button>
       </div>
     </div>
   </div>
@@ -45,7 +45,7 @@
 
 <script>
 import Game from './game.vue';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 import Icon from 'vue-awesome';
 import Spinner from 'vue-simple-spinner';
 
@@ -68,7 +68,7 @@ export default {
   },
 
   methods: {
-    ...mapActions['getCollection'],
+    ...mapMutations(['importMerge', 'importReplace', 'importCancel']),
     getCollection(retry = false) {
       let message = '';
 
