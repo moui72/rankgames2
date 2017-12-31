@@ -1,14 +1,15 @@
 <template>
   <div>
     <h2>Library</h2>
-    <ul v-if="games.length">
-      <li v-for="(game, index) in games">
+    <div v-if="list.length" class="row">
+      <template v-for="(game, index) in list">
         <game
           :id="game.gameId"
-          :name="game.name">
+          :name="game.name"
+          class="col-xs-6 col-sm-4 col-md-3 col-lg-2 game-wrap">
         </game>
-      </li>
-    </ul>
+      </template>
+    </div>
     <div v-show="games.length < 1">
       No games.
     </div>
@@ -18,6 +19,7 @@
 <script>
 import Game from './game.vue';
 import { mapGetters } from 'vuex';
+
 export default {
   name: 'Lib',
 
@@ -25,14 +27,24 @@ export default {
 
   data() {
     return {
-      view: 'all'
+      view: 'all',
+      list: []
+      // @TODO pageinate
     };
   },
   computed: {
     ...mapGetters(['games', 'visibleGames', 'rankableGames'])
   },
-  created: function() {}
+  created: function() {
+    this.list = this.games.slice(0, 20);
+  }
 };
 </script>
 
-<style></style>
+<style lang="scss">
+
+.game-wrap {
+  padding: 1rem;
+}
+
+</style>

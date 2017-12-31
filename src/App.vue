@@ -2,6 +2,7 @@
   <b-container id="app">
     <b-navbar toggleable="md">
       <b-navbar-toggle target="nav_dropdown_collapse"></b-navbar-toggle>
+      <b-navbar-brand href="#"> {{title}} <small>{{version}}</small></b-navbar-brand>
        <b-collapse is-nav id="nav_dropdown_collapse">
          <b-navbar-nav>
            <b-nav-item href="/">Home</b-nav-item>
@@ -9,7 +10,6 @@
          </b-navbar-nav>
        </b-collapse>
     </b-navbar>
-    <h1>{{ title }}</h1>
     <b-modal
       id="import"
       title="Import"
@@ -34,7 +34,9 @@ export default {
   },
   data() {
     return {
-      title: 'Rank Games'
+      title: 'Rank Games',
+      version: '0.0.1',
+      focus: false
     };
   }
 };

@@ -7,15 +7,16 @@
     <div v-show="!loading"
       @keyup.enter="getCollection()">
       <div v-show="preImportGames.length < 1">
-        <b-form-group >
+        <b-form-group>
           <b-input
-          type="text"
-          name="username"
-          v-model="username"
-          placeholder="BGG Username" />
+            ref="focusMe"
+            type="text"
+            name="username"
+            v-model="username"
+            placeholder="BGG Username" />
         </b-form-group>
         <b-button variant="primary" @click="getCollection()">
-          <icon name="download"></icon> Import
+          <icon name="download" class="sr-only"></icon> Import
         </b-button >
       </div>
 
@@ -133,12 +134,9 @@ export default {
       this.message = str;
     }
   },
-
   computed: {
     ...mapGetters(['games', 'preImportGames', 'newGames', 'droppedGames'])
-  },
-
-  created: function() {}
+  }
 };
 </script>
 

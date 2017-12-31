@@ -1,13 +1,14 @@
-<template>
-  <button
+  <template>
+  <b-button
+    :variant="variant"
     @click="toggle({
       property: property,
       value: !value,
       id: id
-    })">
+    })" class="prop-btn">
     <icon :name="icon"></icon>
     <span class="sr-only">set {{property}} to {{!value}}</span>
-  </button>
+  </b-button>
 </template>
 <script>
 import 'vue-awesome/icons/eye';
@@ -33,15 +34,23 @@ export default {
           true: 'toggle-on',
           false: 'toggle-off'
         }
+      },
+      variants: {
+        visible: 'warning',
+        rankable: 'danger'
       }
     };
   },
   computed: {
     icon() {
       return this.icons[this.property][this.value];
+    },
+    variant() {
+      return (!this.value ? 'outline-' : '') + this.variants[this.property];
     }
   },
   methods: { ...mapMutations(['toggle']) }
 };
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+</style>

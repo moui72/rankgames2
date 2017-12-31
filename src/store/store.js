@@ -2,17 +2,19 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import _ from 'lodash';
+import createPersistedState from 'vuex-persistedstate';
 
 Vue.use(Vuex);
 
 const state = {
-  settings: {
-    merge: false
-  },
   requests: [],
   games: [],
   preImportGames: [],
-  toggleables: ['visible', 'rankable']
+  toggleables: {
+    // propertyName: default value
+    visible: true,
+    rankable: true
+  }
 };
 
 const getters = {
@@ -34,15 +36,14 @@ const getters = {
   droppedGames: state => {
     return _.differenceBy(state.games, state.preImportGames, 'gameId');
   },
-  toggles: state => id => {
-    let g = _.find(state.games, game => {
+  toggles: state => {
+    return Object.keys(state.toggleables);
+  },
+  getProp: state => (id, prop) => {
+    let g = state.games.find(game => {
       return game.gameId == id;
     });
-    let obj = {};
-    _.forEach(state.toggleables, p => {
-      obj[p] = g[p];
-    });
-    return obj;
+    return g[prop];
   }
 };
 
@@ -64,7 +65,7 @@ const actions = {
           if (data.error) {
             return reject(data.error.message);
           }
-          commit('importCollection', data);
+          commit('preprocessCollection', data);
           return resolve(response);
         })
         .catch(error => {
@@ -83,29 +84,33 @@ const mutations = {
    * @return {void}                 no return value
    */
   importMerge(state) {
-    let newSet = _.unionBy(
-      this.state.games,
-      this.state.preImportGames,
-      'gameId'
-    );
+    let newSet = _.unionBy(state.games, state.preImportGames, 'gameId');
     state.games = newSet;
+    state.preImportGames = [];
   },
-  importReplace() {},
-  importCancel() {},
-  importCollection(state, collection) {
-    let toggleables = {};
-    // this.state.toggleables: string[] (property names)
-    _.forEach(this.state.toggleables, p => {
-      toggleables[p] = true;
-    });
+  importReplace(state) {
+    state.games = state.preImportGames;
+    state.preImportGames = [];
+  },
+  importCancel(state) {
+    state.preImportGames = [];
+  },
+  /**
+   * Maps BGG data to a flat object with this apps toggleable properties
+   * inserted, defaulted to true, and adds to state as state as preImportGames
+   * for user to choose to merge with or replace state.games, or discard.
+   * @param  {Object}   state       app state
+   * @param  {Object[]} collection  game collection from server
+   * @return {void}                 no return value
+   */
+  preprocessCollection(state, collection) {
     let prepdCollection = _.map(collection, game => {
       return {
-        ...toggleables,
+        ...state.toggleables,
         ...game
       };
     });
     state.preImportGames = prepdCollection;
-    console.log(prepdCollection);
   },
   /**
    * Mutates the value of a game's toggleable property
@@ -118,19 +123,14 @@ const mutations = {
    * @return {Void}           No return statement.
    */
   toggle(state, payload) {
-    _.find(state.games, game => {
+    state.games.find(game => {
       return game.gameId == payload.id;
     })[payload.property] =
       payload.value;
-    /*
-    is the following better than the above?
-    state.games[
-      _.findIndex(state.games, g => {
-        return g.gameId == payload.id;
-      })
-    ][payload.property] =
-      payload.value;
-    */
+    //   _.find(state.games, game => {
+    //     return game.gameId == payload.id;
+    //   })[payload.property] =
+    //     payload.value;
   }
 };
 
@@ -138,5 +138,6 @@ export default new Vuex.Store({
   state,
   getters,
   actions,
-  mutations
+  mutations,
+  plugins: [createPersistedState()]
 });
