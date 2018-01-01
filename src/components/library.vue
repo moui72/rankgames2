@@ -1,6 +1,7 @@
 <template>
   <div>
     <h2>Library</h2>
+    <page-controls :pages="pages" @pageChange="setPage" @next="nextPage" @orev="prevPage"></page-controls>
     <div v-if="list.length" class="row">
       <template v-for="(game, index) in list">
         <game
@@ -10,6 +11,7 @@
         </game>
       </template>
     </div>
+    <page-controls :pages="pages" @pageChange="setPage" @next="nextPage" @orev="prevPage></page-controls>
     <div v-show="games.length < 1">
       No games.
     </div>
@@ -18,25 +20,46 @@
 
 <script>
 import Game from './game.vue';
+import PageControls from './page-controls.vue';
 import { mapGetters } from 'vuex';
 
 export default {
   name: 'Lib',
 
-  components: { Game },
+  components: { Game, PageControls },
 
   data() {
     return {
       view: 'all',
-      list: []
-      // @TODO pageinate
+      page: 1,
+      perPage: 24
+      // @TODO paginate
     };
   },
   computed: {
-    ...mapGetters(['games', 'visibleGames', 'rankableGames'])
+    ...mapGetters(['games', 'visibleGames', 'rankableGames']),
+    pages() {
+      return Math.ceil(this.games.length / this.perPage);
+    },
+    list() {
+      return this.games.slice(
+        (this.page - 1) * this.perPage,
+        this.page * this.perPage
+      );
+    }
   },
-  created: function() {
-    this.list = this.games.slice(0, 20);
+  methods: {
+    setPage(p) {
+      console.log('pgs', p);
+      this.page = p;
+    },
+    nextPage() {
+      if (this.page >= this.pages) return false;
+      this.page += 1;
+    },
+    prevPage() {
+      if (this.page <= 1) return false;
+    }
   }
 };
 </script>
@@ -46,5 +69,4 @@ export default {
 .game-wrap {
   padding: 1rem;
 }
-
 </style>

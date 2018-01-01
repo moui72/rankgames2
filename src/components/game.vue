@@ -27,8 +27,8 @@
   </div>
 </template>
 <script>
-import PropButton from './prop-button.vue';
 import { mapGetters } from 'vuex';
+import PropButton from './prop-button.vue';
 import Icon from 'vue-awesome';
 
 export default {
@@ -45,7 +45,7 @@ export default {
     ...mapGetters(['toggles', 'getProp'])
   },
   methods: {
-    info(id) {
+    info: function(id) {
       console.log(id);
     }
   }
