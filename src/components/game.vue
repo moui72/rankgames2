@@ -1,26 +1,29 @@
 <template>
   <div>
     <div class="game">
-      <img :src="getProp(id, 'thumbnail')" class="border-primary"/>
-
-      <div class="game-body">
-        <div>
-          <h3>{{name}}</h3>
+      <div>
+        <img :src="getProp(id, 'thumbnail')" class="border-primary"/>
+      </div>
+      <div>
+        <div class="px-1">
+          <h3 class="text-center">{{shortName}}</h3>
         </div>
-        <div class="controls align-bottom">
-          <b-button-group>
+      </div>
+      <div class="align-bottom">
+        <div class="c">
+          <b-button-group class="mx-auto align-bottom">
             <template v-for="prop in toggles">
               <prop-button
-                :property="prop"
-                :value="getProp(id, prop)"
-                :id="id">
-              </prop-button>
-            </template>
-            <b-btn variant="info" @click="info(id)">
-              <icon name="info-circle"></icon>
-              <span class="sr-only">view details for {{name}}</span>
-            </b-btn>
-          </b-button-group>
+              :property="prop"
+              :value="getProp(id, prop)"
+              :id="id">
+            </prop-button>
+          </template>
+          <b-btn variant="info" @click="info(id)">
+            <icon name="info-circle"></icon>
+            <span class="sr-only">view details for {{name}}</span>
+          </b-btn>
+        </b-button-group>
         </div>
       </div>
     </div>
@@ -42,11 +45,21 @@ export default {
     Icon
   },
   computed: {
-    ...mapGetters(['toggles', 'getProp'])
+    ...mapGetters(['toggles', 'getProp', 'getGame']),
+    shortName() {
+      let name = this.name.replace(/ [aA]nd /, '&').split(' ');
+      if (name[0].toLowerCase() == 'the') name.shift();
+      if (name.length < 5) return name.join(' ');
+
+      let shortName = name.slice(0, 2).concat(['...'], name.slice(-2));
+      console.log(shortName);
+      return shortName.join(' ');
+    }
   },
   methods: {
     info: function(id) {
       console.log(id);
+      console.log(this.getGame(id));
     }
   }
 };
@@ -55,17 +68,31 @@ export default {
 .game {
   box-shadow: 0px 0px 20px rgba(0,0,0,.9);
   text-align: center;
+  display: table;
   height: 100%;
   width: 100%;
-  img {
+  padding: 0 0 1rem 0;
+
+  >div {
+    display: table-row;
+    >div {
+      display: table-cell;
+      vertical-align: middle;
+
+      &:last-child{
+        vertical-align: bottom;
+      }
+    }
+  }
+  h3{
     width: 100%;
+    font-size: 1.3rem;
+  }
+  img {
+    display: block;
     border-bottom: 1rem solid;
-  }
-  .controls{
-    display: inline;
-  }
-  .btn {
-    margin-bottom: 1rem;
+    width: 100%;
+    self-align: flex-start;
   }
 }
 

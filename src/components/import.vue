@@ -21,7 +21,7 @@
       </div>
 
       <div class="pre-import-games-list" v-if="preImportGames.length > 0">
-        <h3>{{preImportGames.length}} games found</h3>
+        <h3>Found {{preImportGames.length}} unique games</h3>
         <p>
           You may either merge these games into your existing collection
           or replace the current set of games with this set.
@@ -100,9 +100,9 @@ export default {
           }
           message += '.';
           if (response.data.length > 0) {
-            message += ` Found ${response.data.length} game${
+            message += ` Received ${response.data.length} game${
               response.data.length > 1 ? 's' : ''
-            }.`;
+            } from server.`;
           }
           this.report(message);
           this.loading = false;

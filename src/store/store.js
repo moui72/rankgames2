@@ -22,10 +22,10 @@ const getters = {
     return state.games;
   },
   visibleGames: state => {
-    return state.games.filter(game => game.props.toggleable.visible);
+    return state.games.filter(game => game.visible);
   },
   rankableGames: state => {
-    return state.games.filter(game => game.props.toggleable.rankable);
+    return state.games.filter(game => game.rankable);
   },
   preImportGames: state => {
     return state.preImportGames;
@@ -44,6 +44,11 @@ const getters = {
       return game.gameId == id;
     });
     return g[prop];
+  },
+  getGame: state => id => {
+    return state.games.find(game => {
+      return game.gameId == id;
+    });
   }
 };
 
@@ -104,10 +109,12 @@ const mutations = {
    * @return {void}                 no return value
    */
   preprocessCollection(state, collection) {
+    collection = _.uniqBy(collection, 'gameId');
     let prepdCollection = _.map(collection, game => {
       return {
         ...state.toggleables,
-        ...game
+        ...game,
+        ignore: false
       };
     });
     state.preImportGames = prepdCollection;
