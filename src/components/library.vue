@@ -2,22 +2,16 @@
   <div>
     <h2>Library</h2>
     <div class="my-2 text-center">
-      <b-dropdown :text="({
-        vbl: 'Default',
-        rbl: 'Rankable only',
-        all: 'Unrestricted',
-        inv: 'Invisible only',
-        unr: 'Unrankable only'
-        }[view]) + ' view'">
+      <b-dropdown :text="'Current view: ' + viewObj.text" variant="primary">
+        <template v-for="(view, name) in viewObjs">
+          <b-dropdown-item @click="setView(name)" :title="view.description">
+            {{view.text}}
+          </b-dropdown-item>
+        </template>
 
-        <b-dropdown-item @click="setView('vbl')">Default</b-dropdown-item>
-        <b-dropdown-item @click="setView('rbl')">Rankable only</b-dropdown-item>
-        <b-dropdown-item @click="setView('unr')">Show not rankable only</b-dropdown-item>
-        <b-dropdown-item @click="setView('inv')">Show hidden only</b-dropdown-item>
-        <b-dropdown-item @click="setView('all')">All</b-dropdown-item>
 
       </b-dropdown>
-      <b-dropdown text="Filter">
+      <b-dropdown text="Add a filter" variant="info">
         <template v-for="(filter, name) in filters">
           <b-dd-item @click="setFilter(name)">
             {{activeFilters.indexOf(name) >= 0 ?
@@ -49,7 +43,7 @@
       @pageChange="setPage"
       @next="nextPage"
       @prev="prevPage"></page-controls>
-    <div v-show="games.length < 1">
+    <div v-show="list.length < 1">
       No games.
     </div>
   </div>
@@ -58,7 +52,7 @@
 <script>
 import Game from './game.vue';
 import PageControls from './page-controls.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'Lib',
@@ -76,20 +70,12 @@ export default {
         isExpansion: { test: false, text: 'expansions' },
         numPlays: { test: 1, text: "games I haven't played" }
       },
-      view: 'all',
-      views: {
-        all: 'games',
-        vbl: 'visibleGames',
-        rbl: 'rankableGames',
-        inv: 'games',
-        unr: 'games'
-      },
       page: 1,
       perPage: 24
     };
   },
   computed: {
-    ...mapGetters(['games', 'visibleGames', 'rankableGames']),
+    ...mapGetters(['games', 'viewObj', 'viewObjs']),
     pages() {
       return Math.ceil(this.viewGames.length / this.perPage);
     },
@@ -100,16 +86,9 @@ export default {
       );
     },
     viewGames() {
-      return this[this.views[this.view]].filter(game => {
+      return this.games.filter(game => {
         let show = true;
         this.activeFilters.forEach(filter => {
-          console.log(
-            filter,
-            game[filter],
-            game[filter] !== this.filters[filter].test,
-            typeof this.filters[filter].test != 'number' ||
-              game[filter] <= this.filters[filter].test
-          );
           if (
             game[filter] !== this.filters[filter].test &&
             (typeof this.filters[filter].test != 'number' ||
@@ -123,6 +102,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setView']),
     setFilter(f) {
       let index = this.activeFilters.indexOf(f);
       if (index >= 0) {
@@ -132,14 +112,7 @@ export default {
       this.activeFilters.push(f);
       return true;
     },
-    setView(v) {
-      console.log(this.view, '=>', v);
-      console.log([this.views[v]]);
-
-      this.view = v;
-    },
     setPage(p) {
-      console.log('pgs', p);
       this.page = p;
     },
     nextPage() {

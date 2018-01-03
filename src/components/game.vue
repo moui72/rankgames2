@@ -1,12 +1,21 @@
 <template>
   <div>
     <div class="game">
-      <div>
-        <img :src="getProp(id, 'thumbnail')" class="border-primary"/>
+      <div class="img-wrap">
+        <b-img-lazy
+          v-if="thumb"
+          blank-src
+          :alt="'Small image of box cover for '+name"
+          :src="thumb"
+          class="border-primary"/>
+        <b-img v-else
+          blank :alt="'No box cover image available for '+ name"
+          :src="thumb" class="border-primary"
+          height="170" blank-color="rgba(0,0,0,.15)"/>
       </div>
       <div>
         <div class="px-1">
-          <h3 class="text-center">{{shortName}}</h3>
+          <h3 class="text-center">{{truncName}}</h3>
         </div>
       </div>
       <div class="align-bottom">
@@ -46,14 +55,18 @@ export default {
   },
   computed: {
     ...mapGetters(['toggles', 'getProp', 'getGame']),
-    shortName() {
-      let name = this.name.replace(/ [aA]nd /, '&').split(' ');
-      if (name[0].toLowerCase() == 'the') name.shift();
-      if (name.length < 5) return name.join(' ');
-
-      let shortName = name.slice(0, 2).concat(['...'], name.slice(-2));
-      console.log(shortName);
-      return shortName.join(' ');
+    thumb() {
+      return this.getProp(this.id, 'thumbnail');
+    },
+    truncName() {
+      if (this.name.length < 25) return this.name;
+      if (this.name.split(' ').length < 6)
+        return this.name.substr(0, 15) + '...' + this.name.substr(-5);
+      let name = this.name.split(' ');
+      let nameArr = name.slice(0, 3).concat(['...'], name.slice(-2));
+      name = nameArr.join(' ');
+      if (name.length < 25) return name;
+      return name.substr(0, 15) + '...' + name.substr(-5);
     }
   },
   methods: {
@@ -93,6 +106,9 @@ export default {
     border-bottom: 1rem solid;
     width: 100%;
     self-align: flex-start;
+    object-fit: cover;
+    object-position: 50% 0;
+    max-height: 170px;
   }
 }
 

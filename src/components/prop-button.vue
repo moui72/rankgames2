@@ -5,7 +5,9 @@
       property: property,
       value: !value,
       id: id
-    })" class="prop-btn">
+    })"
+    class="prop-btn"
+    :title="desc">
     <icon :name="icon"></icon>
     <span class="sr-only">set {{property}} to {{!value}}</span>
   </b-button>
@@ -42,6 +44,10 @@ export default {
     };
   },
   computed: {
+    desc() {
+      return this.propertyObj(this.property).details;
+    },
+    ...mapGetters(['propertyObj']),
     icon() {
       return this.icons[this.property][this.value];
     },
@@ -49,7 +55,9 @@ export default {
       return (!this.value ? 'outline-' : '') + this.variants[this.property];
     }
   },
-  methods: { ...mapMutations(['toggle']) }
+  methods: {
+    ...mapMutations(['toggle'])
+  }
 };
 </script>
 <style lang="scss">

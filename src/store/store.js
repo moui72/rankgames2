@@ -14,18 +14,69 @@ const state = {
     // propertyName: default value
     visible: true,
     rankable: true
+  },
+  properties: {
+    visible: 'vbln',
+    rankable: 'rbln'
+  },
+  view: 'vbl',
+  views: {
+    vbl: {
+      text: 'Default',
+      details: 'Visible games appear in the default view.',
+      getter: 'visibleGames'
+    },
+    rbl: {
+      text: 'Rankable only',
+      details: 'Rankable games are the candidates for your list(s).',
+      getter: 'rankableGames'
+    },
+    all: {
+      text: 'Unrestricted',
+      details: 'All games.',
+      getter: ''
+    },
+    vbln: {
+      text: 'Invisible only',
+      details: 'Invisible games do not appear in the default view.',
+      getter: 'visibleGames'
+    },
+    rbln: {
+      text: 'Unrankable only',
+      details:
+        'Unrankable games still appear in the default view, but are not ' +
+        'considered as candidates for your list(s).',
+      getter: 'rankableGames'
+    }
   }
 };
 
 const getters = {
-  games: state => {
-    return state.games;
+  currentView: state => {
+    return state.view;
+  },
+  games: (state, getters) => {
+    if (getters.currentView == 'all') return state.games;
+    return getters[state.views[getters.currentView].getter];
+  },
+  viewObj: (state, getters) => {
+    return state.views[getters.currentView];
+  },
+  propertyObj: state => prop => {
+    return state.views[state.properties[prop]];
+  },
+  viewObjs: state => {
+    return state.views;
   },
   visibleGames: state => {
-    return state.games.filter(game => game.visible);
+    return state.games.filter(game => {
+      return game.visible == !(state.view.charAt(3) == 'n');
+    });
   },
   rankableGames: state => {
-    return state.games.filter(game => game.rankable);
+    return state.games.filter(game => {
+      return game.rankable == !(state.view.charAt(3) == 'n');
+    });
   },
   preImportGames: state => {
     return state.preImportGames;
@@ -81,6 +132,9 @@ const actions = {
 };
 
 const mutations = {
+  setView(state, v) {
+    state.view = v;
+  },
   /**
    * Processes data from server, shapes it for this app's use, and insert it
    * into state as preImportGames (does not change state.games)

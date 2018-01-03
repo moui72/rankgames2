@@ -108,12 +108,10 @@ export default {
           this.loading = false;
         },
         error => {
-          console.log(error);
           message = error;
           this.alertType = 'warning';
           if (error.includes('queued') && this.attempts < this.maxAttempts) {
             // @TODO update user on retry
-            console.log('retry #' + this.attempts);
             //
             message += ' Retry #' + this.attempts + '.';
             let ref = this;
