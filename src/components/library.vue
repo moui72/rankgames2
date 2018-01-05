@@ -1,6 +1,7 @@
 <template>
   <div>
     <h2>Library</h2>
+    <filters></filters>
     <div class="my-2 text-center">
       <b-dropdown :text="'Current view: ' + viewObj.text" variant="primary">
         <template v-for="(view, name) in viewObjs">
@@ -8,8 +9,6 @@
             {{view.text}}
           </b-dropdown-item>
         </template>
-
-
       </b-dropdown>
       <b-dropdown text="Add a filter" variant="info">
         <template v-for="(filter, name) in filters">
@@ -52,30 +51,27 @@
 <script>
 import Game from './game.vue';
 import PageControls from './page-controls.vue';
+import Filters from './filters.vue';
 import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'Lib',
 
-  components: { Game, PageControls },
+  components: { Game, PageControls, Filters },
+  // @ TODO move filter state to store.js
 
   data() {
     return {
-      activeFilters: [],
-      filters: {
-        owned: {
-          test: true,
-          text: "games I don't own"
-        },
-        isExpansion: { test: false, text: 'expansions' },
-        numPlays: { test: 1, text: "games I haven't played" }
-      },
-      page: 1,
-      perPage: 24
+      page: 1
     };
   },
   computed: {
     ...mapGetters(['games', 'viewObj', 'viewObjs']),
+    ...mapGetters({
+      activeFilters: 'getActiveFilters',
+      filters: 'getFilters',
+      perPage: 'getPerPage'
+    }),
     pages() {
       return Math.ceil(this.viewGames.length / this.perPage);
     },
@@ -102,16 +98,8 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setView']),
-    setFilter(f) {
-      let index = this.activeFilters.indexOf(f);
-      if (index >= 0) {
-        this.activeFilters.splice(index, 1);
-        return false;
-      }
-      this.activeFilters.push(f);
-      return true;
-    },
+    ...mapMutations(['setView', 'setFilter']),
+
     setPage(p) {
       this.page = p;
     },

@@ -62,7 +62,11 @@ export default {
         background-color: #ccf;
       }
       &.current{
-        background-color: #cfc;
+        background-color: #339;
+        color: #fff;
+        &:hover {
+          color: #fff;
+        }
 
       }
     }

@@ -7,6 +7,16 @@ import createPersistedState from 'vuex-persistedstate';
 Vue.use(Vuex);
 
 const state = {
+  perPage: 24,
+  activeFilters: [],
+  filters: {
+    owned: {
+      test: true,
+      text: "games I don't own"
+    },
+    isExpansion: { test: false, text: 'expansions' },
+    numPlays: { test: 1, text: "games I haven't played" }
+  },
   requests: [],
   games: [],
   preImportGames: [],
@@ -52,6 +62,18 @@ const state = {
 };
 
 const getters = {
+  getPerPage: state => {
+    return state.perPage;
+  },
+  getActiveFilters: state => {
+    return state.activeFilters;
+  },
+  getFilter: state => filterName => {
+    return state.filters[filterName];
+  },
+  getFilters: state => {
+    return state.filters;
+  },
   currentView: state => {
     return state.view;
   },
@@ -132,6 +154,18 @@ const actions = {
 };
 
 const mutations = {
+  setPerPage(state, n) {
+    state.perPage = n;
+  },
+  setFilter(state, f) {
+    let index = state.activeFilters.indexOf(f);
+    if (index >= 0) {
+      state.activeFilters.splice(index, 1);
+      return false;
+    }
+    state.activeFilters.push(f);
+    return true;
+  },
   setView(state, v) {
     state.view = v;
   },
