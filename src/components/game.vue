@@ -66,7 +66,8 @@ export default {
       let nameArr = name.slice(0, 3).concat(['...'], name.slice(-2));
       name = nameArr.join(' ');
       if (name.length < 25) return name;
-      return name.substr(0, 15) + '...' + name.substr(-5);
+      name = name.substr(0, 15) + '...' + name.substr(-5);
+      return name.replace(/(\.\.\.)+/, '...');
     }
   },
   methods: {

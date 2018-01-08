@@ -36,8 +36,8 @@
         <p>
           Games that would be dropped if replaced: {{droppedGames.length}}.
         </p>
-        <b-button @click="importMerge()" variant="info">Merge</b-button>
-        <b-button @click="importReplace()" variant="danger">Replace</b-button>
+        <b-button @click="merge()" variant="info">Merge</b-button>
+        <b-button @click="replace()" variant="danger">Replace</b-button>
         <b-button @click="importCancel()" variant="warning">Cancel</b-button>
       </div>
     </div>
@@ -70,6 +70,14 @@ export default {
 
   methods: {
     ...mapMutations(['importMerge', 'importReplace', 'importCancel']),
+    merge() {
+      this.importMerge();
+      this.$emit('ok');
+    },
+    replace() {
+      this.importReplace();
+      this.$emit('ok');
+    },
     getCollection(retry = false) {
       let message = '';
 
@@ -78,16 +86,6 @@ export default {
         this.attempts = 1;
         message = 'Request submitted.';
         this.report(message);
-      }
-
-      if (this.attempts > this.maxAttempts) {
-        // @TODO report to user
-        message = `Request still queued after ${
-          this.attempts
-        } attempts. Server likely under heavy load. Please try again later.`;
-        this.report(message);
-        this.alertType = 'warning';
-        return false;
       }
 
       this.loading = true;
@@ -110,15 +108,25 @@ export default {
         error => {
           message = error;
           this.alertType = 'warning';
-          if (error.includes('queued') && this.attempts < this.maxAttempts) {
+          if (error.includes('queued')) {
             // @TODO update user on retry
             //
-            message += ' Retry #' + this.attempts + '.';
-            let ref = this;
-            this.report(message);
-            setTimeout(function() {
-              ref.getCollection(true);
-            }, 2000);
+            if (this.attempts < this.maxAttempts) {
+              message += ' Retry #' + this.attempts + '.';
+              let ref = this;
+              this.report(message);
+              setTimeout(function() {
+                ref.getCollection(true);
+              }, 2000);
+            } else {
+              message = `Request still queued after ${
+                this.attempts
+              } attempts. Server likely under heavy load. Please try again later.`;
+              this.report(message);
+              this.alertType = 'warning';
+              this.loading = false;
+              return false;
+            }
           } else {
             this.alertType = 'danger';
             this.report(message);

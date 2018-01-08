@@ -9,13 +9,17 @@ Vue.use(Vuex);
 const state = {
   perPage: 24,
   activeFilters: [],
+  lists: [],
   filters: {
     owned: {
       test: true,
-      text: "games I don't own"
+      text: "games I don't own",
+      simple: true
     },
-    isExpansion: { test: false, text: 'expansions' },
-    numPlays: { test: 1, text: "games I haven't played" }
+    isExpansion: { test: false, text: 'expansions', simple: true },
+    numPlays: { test: 1, text: "games I haven't played", simple: true },
+    pcf: { test: null, text: 'players', simple: false },
+    ur: { test: null, text: 'user rating', simple: false }
   },
   requests: [],
   games: [],
@@ -62,6 +66,14 @@ const state = {
 };
 
 const getters = {
+  getLists: state => {
+    return state.lists;
+  },
+  activePCF: state => {
+    return state.activeFilters.some(f => {
+      return f.indexOf('pcf') >= 0;
+    });
+  },
   getPerPage: state => {
     return state.perPage;
   },
@@ -81,6 +93,34 @@ const getters = {
     if (getters.currentView == 'all') return state.games;
     return getters[state.views[getters.currentView].getter];
   },
+  filteredGames: (state, getters) => {
+    return state.games.filter(game => {
+      let show = true;
+      state.activeFilters.forEach(filter => {
+        if (filter.substr(0, 3) === 'pcf') {
+          // player count filter
+          let pcfArgs = filter.split('-');
+          if (pcfArgs.length < 3) {
+            // includes mode
+            show =
+              game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[1];
+          } else {
+            show =
+              game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[2];
+          }
+        } else {
+          if (
+            game[filter] !== state.filters[filter].test &&
+            (typeof state.filters[filter].test != 'number' ||
+              game[filter] < state.filters[filter].test)
+          ) {
+            show = false;
+          }
+        }
+      });
+      return show;
+    });
+  },
   viewObj: (state, getters) => {
     return state.views[getters.currentView];
   },
@@ -90,13 +130,13 @@ const getters = {
   viewObjs: state => {
     return state.views;
   },
-  visibleGames: state => {
-    return state.games.filter(game => {
+  visibleGames: (state, getters) => {
+    return getters.filteredGames.filter(game => {
       return game.visible == !(state.view.charAt(3) == 'n');
     });
   },
-  rankableGames: state => {
-    return state.games.filter(game => {
+  rankableGames: (state, getters) => {
+    return getters.filteredGames.filter(game => {
       return game.rankable == !(state.view.charAt(3) == 'n');
     });
   },
@@ -143,6 +183,7 @@ const actions = {
           if (data.error) {
             return reject(data.error.message);
           }
+          data['user'] = username;
           commit('preprocessCollection', data);
           return resolve(response);
         })
@@ -154,6 +195,24 @@ const actions = {
 };
 
 const mutations = {
+  makeNewList(state, name) {
+    state.lists.push({
+      name: name,
+      games: state.rankableGames,
+      list: []
+    });
+  },
+  clearPCF(state) {
+    let index = state.activeFilters.findIndex(f => {
+      console.log(f.indexOf('pcf'));
+      return f.indexOf('pcf') >= 0;
+    });
+    if (index >= 0) {
+      state.activeFilters.splice(index, 1);
+      return index;
+    }
+    return index;
+  },
   setPerPage(state, n) {
     state.perPage = n;
   },
@@ -161,10 +220,10 @@ const mutations = {
     let index = state.activeFilters.indexOf(f);
     if (index >= 0) {
       state.activeFilters.splice(index, 1);
-      return false;
+      return index;
     }
     state.activeFilters.push(f);
-    return true;
+    return index;
   },
   setView(state, v) {
     state.view = v;
@@ -178,6 +237,16 @@ const mutations = {
    */
   importMerge(state) {
     let newSet = _.unionBy(state.games, state.preImportGames, 'gameId');
+    let conflicts = _.intersectionBy(
+      state.preImportGames,
+      state.games,
+      'gameId'
+    );
+    conflicts.forEach(cgame => {
+      newSet.find(ngame => {
+        _.assign(ngame.ratings, cgame.ratings);
+      });
+    });
     state.games = newSet;
     state.preImportGames = [];
   },
@@ -197,13 +266,18 @@ const mutations = {
    * @return {void}                 no return value
    */
   preprocessCollection(state, collection) {
+    console.log(collection.user);
+    let user = collection.user;
     collection = _.uniqBy(collection, 'gameId');
     let prepdCollection = _.map(collection, game => {
-      return {
+      let g = {
         ...state.toggleables,
         ...game,
-        ignore: false
+        user: user
       };
+      g['ratings'] = {};
+      g['ratings'][g.user] = g.rating;
+      return g;
     });
     state.preImportGames = prepdCollection;
   },
@@ -234,5 +308,9 @@ export default new Vuex.Store({
   getters,
   actions,
   mutations,
-  plugins: [createPersistedState()]
+  plugins: [
+    createPersistedState({
+      paths: ['perPage', 'activeFilters', 'requests', 'games', 'view']
+    })
+  ]
 });
