@@ -9,6 +9,7 @@
     class="prop-btn"
     :title="desc">
     <icon :name="icon"></icon>
+    <span v-if="size == 'lg'">{{text}}</span>
     <span class="sr-only">set {{property}} to {{!value}}</span>
   </b-button>
 </template>
@@ -23,7 +24,7 @@ import { mapMutations, mapGetters } from 'vuex';
 
 export default {
   name: 'PropButton',
-  props: { property: String, value: Boolean, id: Number },
+  props: { property: String, value: Boolean, id: Number, size: String },
   components: { Icon },
   data() {
     return {
@@ -53,6 +54,19 @@ export default {
     },
     variant() {
       return (!this.value ? 'outline-' : '') + this.variants[this.property];
+    },
+    text() {
+      let texts = {
+        visible: {
+          true: 'Hide this game',
+          false: 'Show this game'
+        },
+        rankable: {
+          true: 'Make unrankable',
+          false: 'Make rankable'
+        }
+      };
+      return texts[this.property][this.value];
     }
   },
   methods: {

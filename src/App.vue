@@ -5,27 +5,21 @@
       <b-navbar-toggle target="nav_dropdown_collapse"></b-navbar-toggle>
       <b-navbar-brand href="#"> {{title}} <small>{{version}}</small></b-navbar-brand>
        <b-collapse is-nav id="nav_dropdown_collapse">
-         <b-navbar-nav>
+         <b-navbar-nav class="mr-auto">
            <b-nav-item href="/">Home</b-nav-item>
-           <b-nav-item v-b-modal="'import'">Import</b-nav-item>
-           <b-nav-item>Lists</b-nav-item>
+           <b-nav-item to="/lists">Lists</b-nav-item>
            <b-nav-item v-b-modal="'settings'" title="settings">
              <icon name="cog"></icon>
              <span class="sr-only">settings</span>
            </b-nav-item>
          </b-navbar-nav>
+         <b-navbar-nav v-if="!isHome()" class="float-right">
+           <b-nav-item @click="back">
+             &times; Back
+           </b-nav-item>
+         </b-navbar-nav>
        </b-collapse>
     </b-navbar>
-
-    <b-modal
-      id="import"
-      title="Import"
-      ok-only
-      ok-title="Close"
-      ok-variant="secondary"
-      ref="importer">
-      <import @ok="closeImporter()"></import>
-    </b-modal>
 
     <b-modal
       id="settings"
@@ -45,22 +39,18 @@
       </b-form-group>
     </b-modal>
 
-    <lib class="container-fluid mt-2"></lib>
+    <router-view class="container-fluid"></router-view>
   </div>
 </template>
 
 <script>
 import { mapMutations } from 'vuex';
-import Lib from './components/library.vue';
-import Import from './components/import.vue';
 import Icon from 'vue-awesome';
 
 //@TODO ROUTES!!!!11 (library, list)
 export default {
   name: 'app',
   components: {
-    Lib,
-    Import,
     Icon
   },
   data() {
@@ -73,12 +63,32 @@ export default {
   },
   methods: {
     ...mapMutations(['setPerPage']),
-    closeImporter() {
-      this.$refs.importer.hide();
+
+    back() {
+      this.hasHistory();
+    },
+    hasHistory() {
+      console.log(this.$router);
+    },
+    isHome() {
+      return this.$route.name == 'Home';
     }
   }
 };
 </script>
 
 <style lang="scss">
+body, html {
+  background-color: #ccc;
+}
+.base {
+  box-shadow: 0px 0px 5px rgba(0,0,0,.6);
+  background-color: white;
+  border-radius: .2rem;
+
+}
+.widget {
+  @extend .base;
+  padding: 1rem;
+}
 </style>

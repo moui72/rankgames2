@@ -10,6 +10,7 @@ const state = {
   perPage: 24,
   activeFilters: [],
   lists: [],
+  libraries: [],
   filters: {
     owned: {
       test: true,
@@ -68,6 +69,11 @@ const state = {
 const getters = {
   getLists: state => {
     return state.lists;
+  },
+  getList: state => id => {
+    return state.lists.find(list => {
+      return id == list.id;
+    });
   },
   activePCF: state => {
     return state.activeFilters.some(f => {
@@ -195,14 +201,47 @@ const actions = {
 };
 
 const mutations = {
-  makeNewList(state, name) {
+  renameList(state, payload) {
+    console.log(payload);
+    state.lists.find(list => {
+      return list.id === payload.id;
+    }).name =
+      payload.newName;
+  },
+  purgeLists(state) {
+    state.lists = [];
+  },
+  deleteList(state, payload) {
+    state.lists = state.lists.filter(list => {
+      return list.id !== payload.id;
+    });
+  },
+  makeNewList(state, payload) {
+    const listIDs = state.lists.map(list => {
+      return list.id;
+    });
+    let nextId = listIDs.length;
+    for (let i = 0; i < nextId; i++) {
+      if (i < listIDs[i]) {
+        nextId = i;
+      }
+    }
+    let ids = state.games.map(game => game.gameId);
+    console.log(ids);
     state.lists.push({
-      name: name,
-      games: state.rankableGames,
+      name: payload.name,
+      games: ids,
+      created: Date.now(),
+      modified: Date.now(),
+      id: nextId,
       list: []
+    });
+    state.lists.sort(function(a, b) {
+      return a.id - b.id;
     });
   },
   clearPCF(state) {
+    // PCF = "player count filter"
     let index = state.activeFilters.findIndex(f => {
       console.log(f.indexOf('pcf'));
       return f.indexOf('pcf') >= 0;
@@ -211,7 +250,6 @@ const mutations = {
       state.activeFilters.splice(index, 1);
       return index;
     }
-    return index;
   },
   setPerPage(state, n) {
     state.perPage = n;
@@ -296,10 +334,6 @@ const mutations = {
       return game.gameId == payload.id;
     })[payload.property] =
       payload.value;
-    //   _.find(state.games, game => {
-    //     return game.gameId == payload.id;
-    //   })[payload.property] =
-    //     payload.value;
   }
 };
 
@@ -310,7 +344,7 @@ export default new Vuex.Store({
   mutations,
   plugins: [
     createPersistedState({
-      paths: ['perPage', 'activeFilters', 'requests', 'games', 'view']
+      paths: ['perPage', 'activeFilters', 'requests', 'games', 'view', 'lists']
     })
   ]
 });

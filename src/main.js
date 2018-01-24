@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import BootstrapVue from 'bootstrap-vue';
+import moment from 'moment';
 
 import App from './App.vue';
 import store from './store/store.js';
@@ -10,11 +11,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 import GameDetail from './pages/game-detail.vue';
+import Lists from './pages/lists-page.vue';
+import Home from './pages/home.vue';
+import ListPage from './pages/list-page.vue';
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
 
-const routes = [{ path: '/game/:id', component: GameDetail }];
+Vue.filter('formatDate', function(value) {
+  if (value) {
+    return moment(value).format('MM/DD/YYYY hh:mm');
+  }
+});
+
+const routes = [
+  { path: '/lists', component: Lists },
+  { path: '/game/:id', component: GameDetail },
+  { path: '/list/:id', component: ListPage },
+  { path: '/', component: Home, name: 'Home' }
+];
 const router = new VueRouter({ routes });
 
 const app = new Vue({

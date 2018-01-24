@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="game">
+    <div class="game-box">
       <div class="img-wrap">
         <b-img-lazy
           v-if="thumb"
           blank-src
-          :alt="'Small image of box cover for '+name"
+          :alt="'Small image of box cover for ' + name"
           :src="thumb"
           class="border-primary"/>
         <b-img v-else
@@ -14,7 +14,7 @@
           height="170" blank-color="rgba(0,0,0,.15)"/>
       </div>
       <div>
-        <div class="px-1">
+        <div class="px-1 mt-1">
           <h3 class="text-center">{{truncName}}</h3>
         </div>
       </div>
@@ -45,7 +45,7 @@ import Icon from 'vue-awesome';
 
 export default {
   name: 'Game',
-  props: { id: Number, name: String },
+  props: { id: Number },
   data() {
     return {};
   },
@@ -55,6 +55,9 @@ export default {
   },
   computed: {
     ...mapGetters(['toggles', 'getProp', 'getGame']),
+    name() {
+      return this.getGame(this.id).name;
+    },
     thumb() {
       return this.getProp(this.id, 'thumbnail');
     },
@@ -74,18 +77,26 @@ export default {
     info: function(id) {
       console.log(id);
       console.log(this.getGame(id));
+      this.$router.push('/game/' + id);
     }
   }
 };
 </script>
-<style lang="scss">
-.game {
-  box-shadow: 0px 0px 20px rgba(0,0,0,.9);
+<style lang="scss" >
+.game-box {
   text-align: center;
   display: table;
   height: 100%;
   width: 100%;
   padding: 0 0 1rem 0;
+  box-shadow: 0px 0px 20px rgba(0,0,0,.9);
+  background-color: white;
+  border-radius: .2rem;
+
+  .img-wrap{
+    border-top-left-radius: .2rem;
+    border-top-right-radius: .2rem;
+  }
 
   >div {
     display: table-row;
@@ -103,6 +114,8 @@ export default {
     font-size: 1.3rem;
   }
   img {
+    border-top-left-radius: .2rem;
+    border-top-right-radius: .2rem;
     display: block;
     border-bottom: 1rem solid;
     width: 100%;
@@ -110,6 +123,7 @@ export default {
     object-fit: cover;
     object-position: 50% 0;
     max-height: 170px;
+
   }
 }
 

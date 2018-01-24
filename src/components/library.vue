@@ -1,19 +1,23 @@
 <template>
   <div>
-    <!-- header -->
-    <b-row>
-      <b-col>
-        <h2>Library</h2>
-      </b-col>
-      <b-col>
-        <filters></filters>
-      </b-col>
-
-    </b-row>
+    <div class="container-fluid my-3 header widget">
+      <!-- header -->
+      <b-row>
+        <b-col>
+          <h2>Library</h2>
+        </b-col>
+        <b-col>
+          <filters></filters>
+        </b-col>
+      </b-row>
 
     <!-- view and filter control -->
-    <b-button-toolbar class="my-2 text-center">
-      <b-button-group>
+    <b-button-toolbar class="my-2 mx-auto text-center">
+      <b-button-group class="my-1 mr-3">
+        <b-btn variant="primary" v-b-modal="'import'">Import</b-btn>
+      </b-button-group>
+
+      <b-button-group class="my-1 mr-3">
         <b-dropdown :text="'Current view: ' + viewObj.text" variant="info">
           <template v-for="(view, name) in viewObjs">
             <b-dropdown-item @click="setView(name)" :title="view.description">
@@ -36,59 +40,35 @@
             </b-dd-item>
           </b-dropdown>
       </b-button-group>
-      <b-button-group class="mx-3">
-
+      <b-button-group class="my-1">
         <b-btn variant="success" v-b-modal="'makeList'">Make a list</b-btn>
-
-        <b-dropdown text="Modify a list" variant="primary">
-          <b-dropdown-item disabled v-if="lists.length < 1">No lists yet</b-dropdown-item>
-          <template v-else v-for="list in lists">
-            <b-dropdown-item >{{list.name}}</b-dropdown-item>
-          </template>
-        </b-dropdown>
-
       </b-button-group>
     </b-button-toolbar>
+  </div>
+
 
     <!-- games browser -->
-      <!-- top pager -->
-    <page-controls
-      v-show="pages > 1"
-      :pages="pages"
-      :page="page"
-      @pageChange="setPage"
-      @next="nextPage"
-      @prev="prevPage"></page-controls>
-      <!-- games list -->
-    <div v-if="list.length" class="row">
-      <template v-for="(game, index) in list">
-        <game
-          :id="game.gameId"
-          :name="game.name"
-          class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap">
-        </game>
-      </template>
-    </div>
-      <!-- bottom pager -->
-    <page-controls
-      v-show="pages > 1"
-      :pages="pages"
-      :page="page"
-      @pageChange="setPage"
-      @next="nextPage"
-      @prev="prevPage"></page-controls>
-    <div v-show="list.length < 1">
-      No games.
-    </div>
+    <games-browser></games-browser>
+
 
 
     <!-- MODALS -->
+    <!-- import -->
+    <b-modal
+      id="import"
+      title="Import"
+      ok-only
+      ok-title="Close"
+      ok-variant="secondary"
+      ref="importer">
+      <import @ok="closeImporter()"></import>
+    </b-modal>
     <!-- make a list -->
     <b-modal
       id="makeList"
       title="Make a list"
       ok-title="Create"
-      @ok="makeNewList(newListName)">
+      @ok="makeList(newListName)">
       <p>
         Creating a list with a pool of {{rankableGames.length}} rankable games.
       </p>
@@ -141,20 +121,18 @@
 </template>
 
 <script>
-import Game from './game.vue';
-import PageControls from './page-controls.vue';
+import GamesBrowser from './games-browser.vue';
+import Import from './import.vue';
 import Filters from './filters.vue';
 import { mapGetters, mapMutations } from 'vuex';
 
 export default {
-  name: 'Lib',
+  name: 'Library',
 
-  components: { Game, PageControls, Filters },
-  // @ TODO move filter state to store.js
+  components: { GamesBrowser, Filters, Import },
 
   data() {
     return {
-      page: 1,
       playerCount: 2,
       playerCountMin: 1,
       playerCountMax: 4,
@@ -164,43 +142,27 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'games',
-      'rankableGames',
       'viewObj',
       'viewObjs',
       'activePCF',
       'isPCF',
-      'allGames'
+      'allGames',
+      'rankableGames'
     ]),
     ...mapGetters({
       activeFilters: 'getActiveFilters',
       filters: 'getFilters',
-      perPage: 'getPerPage',
       lists: 'getLists'
-    }),
-
-    pages() {
-      return Math.ceil(this.games.length / this.perPage);
-    },
-    list() {
-      return this.games.slice(
-        (this.page - 1) * this.perPage,
-        this.page * this.perPage
-      );
-    }
+    })
   },
   methods: {
     ...mapMutations(['setView', 'setFilter', 'clearPCF', 'makeNewList']),
-    setPage(p) {
-      this.page = p;
+    closeImporter() {
+      this.$refs.importer.hide();
     },
-    nextPage() {
-      if (this.page >= this.pages) return false;
-      this.page += 1;
-    },
-    prevPage() {
-      if (this.page <= 1) return false;
-      this.page -= 1;
+    makeList(name) {
+      let listId = this.makeNewList({ name });
+      this.$router.go('/list/' + listId);
     },
     setMode(index) {
       this.playerCountMode = index == 0 ? 'includes' : 'range';
@@ -223,4 +185,5 @@ export default {
 .game-wrap {
   padding: 1rem;
 }
+
 </style>
