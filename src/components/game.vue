@@ -2,16 +2,19 @@
   <div>
     <div class="game-box">
       <div class="img-wrap">
-        <b-img-lazy
-          v-if="thumb"
-          blank-src
-          :alt="'Small image of box cover for ' + name"
-          :src="thumb"
-          class="border-primary"/>
-        <b-img v-else
-          blank :alt="'No box cover image available for '+ name"
-          :src="thumb" class="border-primary"
-          height="170" blank-color="rgba(0,0,0,.15)"/>
+        <slot name="picture">
+          <b-img-lazy
+            v-if="thumb"
+            blank-src
+            :alt="'Small image of box cover for ' + name"
+            :src="thumb"
+            class="border-primary"/>
+          <b-img v-else
+            blank :alt="'No box cover image available for '+ name"
+            :src="thumb" class="border-primary"
+            height="170" blank-color="rgba(0,0,0,.15)"/>
+          </slot>
+        </slot>
       </div>
       <div>
         <div class="px-1 mt-1">
@@ -20,19 +23,21 @@
       </div>
       <div class="align-bottom">
         <div class="c">
-          <b-button-group class="mx-auto align-bottom">
-            <template v-for="prop in toggles">
-              <prop-button
-              :property="prop"
-              :value="getProp(id, prop)"
-              :id="id">
-            </prop-button>
-          </template>
-          <b-btn variant="info" @click="info(id)">
-            <icon name="info-circle"></icon>
-            <span class="sr-only">view details for {{name}}</span>
-          </b-btn>
-        </b-button-group>
+          <slot name="controls">
+            <b-button-group class="mx-auto align-bottom">
+              <template v-for="prop in toggles">
+                <prop-button
+                  :property="prop"
+                  :value="getProp(id, prop)"
+                  :id="id">
+                </prop-button>
+              </template>
+              <b-btn variant="info" @click="info(id)">
+                <icon name="info-circle"></icon>
+                <span class="sr-only">view details for {{name}}</span>
+              </b-btn>
+            </b-button-group>
+          </slot>
         </div>
       </div>
     </div>

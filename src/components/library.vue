@@ -4,7 +4,7 @@
       <!-- header -->
       <b-row>
         <b-col>
-          <h2>Library</h2>
+          <h2>Library <span class="small text-primary">&raquo; {{viewObj.text}}</span></h2>
         </b-col>
         <b-col>
           <filters></filters>
@@ -12,12 +12,12 @@
       </b-row>
 
     <!-- view and filter control -->
-    <b-button-toolbar class="my-2 mx-auto text-center">
-      <b-button-group class="my-1 mr-3">
+    <b-button-toolbar class="mb-4 mx-auto text-center">
+      <b-button-group class="mr-3">
         <b-btn variant="primary" v-b-modal="'import'">Import</b-btn>
       </b-button-group>
 
-      <b-button-group class="my-1 mr-3">
+      <b-button-group class="mr-3">
         <b-dropdown :text="'Current view: ' + viewObj.text" variant="info">
           <template v-for="(view, name) in viewObjs">
             <b-dropdown-item @click="setView(name)" :title="view.description">
@@ -40,10 +40,63 @@
             </b-dd-item>
           </b-dropdown>
       </b-button-group>
-      <b-button-group class="my-1">
+      <b-button-group>
         <b-btn variant="success" v-b-modal="'makeList'">Make a list</b-btn>
       </b-button-group>
     </b-button-toolbar>
+
+    <p>
+      Each game has several buttons associated with it. You can use these
+      buttons to show or hide a game, mark a game as rankable or not rankable,
+      or to get more information about a game.
+
+
+
+    </p>
+    <b-card class="mb-3" no-body>
+      <h4 slot="header">Legend</h4>
+      <b-list-group flush>
+       <b-list-group-item>
+         <prop-button
+           property="visible"
+           :value="true"
+           :id="-1" :disabled="true">
+         </prop-button>
+       </b-list-group-item>
+       <b-list-group-item>
+         <prop-button
+           property="visible"
+           :value="false"
+           :id="-1" :disabled="true">
+         </prop-button>
+       </b-list-group-item>
+       <b-list-group-item>
+         <prop-button
+           property="rankable"
+           :value="true"
+           :id="-1" :disabled="true">
+         </prop-button>
+       </b-list-group-item>
+       <b-list-group-item>
+         <prop-button
+           property="rankable"
+           :value="false"
+           :id="-1" :disabled="true">
+         </prop-button>
+       </b-list-group-item>
+       <b-list-group-item>
+         <b-btn variant="info" @click="info(id)" disabled>
+           <icon name="info-circle" aria-hidden></icon>
+         </b-btn>
+         <span>View details</span>
+
+       </b-list-group-item>
+   </b-list-group>
+
+    </b-card>
+    <p>
+      {{viewObj.details}}
+    </p>
   </div>
 
 
@@ -122,14 +175,16 @@
 
 <script>
 import GamesBrowser from './games-browser.vue';
+import PropButton from './prop-button.vue';
 import Import from './import.vue';
 import Filters from './filters.vue';
+import Icon from 'vue-awesome';
 import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'Library',
 
-  components: { GamesBrowser, Filters, Import },
+  components: { GamesBrowser, Filters, Import, PropButton, Icon },
 
   data() {
     return {
@@ -153,7 +208,10 @@ export default {
       activeFilters: 'getActiveFilters',
       filters: 'getFilters',
       lists: 'getLists'
-    })
+    }),
+    viewDetails() {
+      return this.viewObj.details;
+    }
   },
   methods: {
     ...mapMutations(['setView', 'setFilter', 'clearPCF', 'makeNewList']),

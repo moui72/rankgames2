@@ -34,34 +34,43 @@ const state = {
     visible: 'vbln',
     rankable: 'rbln'
   },
-  view: 'vbl',
+  view: 'dfl',
   views: {
-    vbl: {
+    dfl: {
       text: 'Default',
-      details: 'Visible games appear in the default view.',
-      getter: 'visibleGames'
+      details: 'Showing all rankable games that are marked visible.',
+      getter: 'rvGames'
     },
     rbl: {
-      text: 'Rankable only',
-      details: 'Rankable games are the candidates for your list(s).',
+      text: 'All rankable',
+      details: 'All games marked rankable, including invisible ones.',
       getter: 'rankableGames'
     },
-    all: {
-      text: 'Unrestricted',
-      details: 'All games.',
-      getter: ''
+    vbl: {
+      text: 'Visible only',
+      details:
+        'Showing rankable and unrankable games that are marked as visible.',
+      getter: 'visibleGames'
     },
+
     vbln: {
       text: 'Invisible only',
-      details: 'Invisible games do not appear in the default view.',
+      details:
+        'Invisible games do not appear in the default view. They may or may ' +
+        'not be rankable.',
       getter: 'visibleGames'
     },
     rbln: {
       text: 'Unrankable only',
       details:
-        'Unrankable games still appear in the default view, but are not ' +
+        'Unrankable games do not appear in the default view, and are not ' +
         'considered as candidates for your list(s).',
       getter: 'rankableGames'
+    },
+    all: {
+      text: 'Everything',
+      details: 'Showing all games.',
+      getter: ''
     }
   }
 };
@@ -144,6 +153,11 @@ const getters = {
   rankableGames: (state, getters) => {
     return getters.filteredGames.filter(game => {
       return game.rankable == !(state.view.charAt(3) == 'n');
+    });
+  },
+  rvGames: (state, getters) => {
+    return getters.rankableGames.filter(game => {
+      return game.visible == !(state.view.charAt(3) == 'n');
     });
   },
   preImportGames: state => {
