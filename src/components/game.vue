@@ -27,15 +27,18 @@
             <b-button-group class="mx-auto align-bottom">
               <template v-for="prop in toggles">
                 <prop-button
+                class="mx-1"
                   :property="prop"
                   :value="getProp(id, prop)"
                   :id="id">
                 </prop-button>
               </template>
-              <b-btn variant="info" @click="info(id)">
-                <icon name="info-circle"></icon>
-                <span class="sr-only">view details for {{name}}</span>
-              </b-btn>
+              <div class="mx-1">
+                <b-btn variant="info" @click="info(id)">
+                  <icon name="info-circle"></icon>
+                  <span class="sr-only">view details for {{name}}</span>
+                </b-btn>
+              </div>
             </b-button-group>
           </slot>
         </div>

@@ -34,16 +34,21 @@
             @keyup.esc.native="cancelRename()"
             ></b-form-input>
           <h2 v-show="!editingName">
-            List: {{data.name}}
+            <b-link @click="$router.go(-1)">Lists</b-link> &raquo; "{{data.name}}"
           </h2>
         </div>
       </div>
     </div>
+    <h3 class="base mt-3 p-3">Choose</h3>
+
     <div>
       <!-- comparisons -->
+      <compare :incumbantGame="incumbantGame" :challengerGame="challengerGame"></compare>
     </div>
     <div>
       <!-- ranked -->
+      <h3 class="base mt-3 p-3">Ranked games</h3>
+
       <b-list-group class="base">
         <template v-if="data.list && data.list.length > 1"  >
           <b-list-group-item v-for="game in data.list" :key="game">
@@ -59,7 +64,8 @@
       </b-list-group>
     </div>
     <!-- games browser -->
-    <games-browser :ids="data.games" class="my-3"></games-browser>
+    <h3 class="base mt-3 p-3">Unranked games</h3>
+    <games-browser :ids="data.games" class="mb-3"></games-browser>
   </div>
 
 </template>
@@ -67,6 +73,7 @@
 import { mapGetters, mapMutations } from 'vuex';
 import Game from '../components/game.vue';
 import GamesBrowser from './games-browser.vue';
+import Compare from './compare.vue';
 import Icon from 'vue-awesome';
 export default {
   name: 'List',
@@ -78,11 +85,17 @@ export default {
     };
   },
   props: { id: Number },
-  components: { Icon, Game, GamesBrowser },
+  components: { Icon, Game, GamesBrowser, Compare },
   computed: {
     ...mapGetters(['getList', 'getGame']),
     data() {
       return this.getList(this.id);
+    },
+    incumbantGame() {
+      return this.data.games[0]
+    },
+    challengerGame() {
+      return this.data.games[1]
     }
   },
   methods: {

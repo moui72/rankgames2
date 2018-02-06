@@ -186,13 +186,17 @@ const getters = {
 };
 
 const actions = {
-  getCollection({ commit }, { username }) {
+  importGames({ commit }, { mode }) {
+    commit(mode);
+  },
+  getCollection({ commit }, username) {
+    console.log(username);
     return new Promise((resolve, reject) => {
       if (!username.length) {
         reject('No username provided.');
       }
       let request = 'http://rankgames.ty-pe.com/bggapi/?username=' + username;
-      this.state.requests.push(request);
+      commit('logRequest', request);
       axios
         .get(request)
         .then(response => {
@@ -215,6 +219,9 @@ const actions = {
 };
 
 const mutations = {
+  logRequest(state, payload) {
+    state.requests.push(payload);
+  },
   renameList(state, payload) {
     console.log(payload);
     state.lists.find(list => {

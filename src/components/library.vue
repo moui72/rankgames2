@@ -45,58 +45,68 @@
       </b-button-group>
     </b-button-toolbar>
 
+
+
+    <p class="mt-3">
+      The current view determines which games are visible.
+      Currently: {{viewObj.details}}
+    </p>
+
     <p>
       Each game has several buttons associated with it. You can use these
       buttons to show or hide a game, mark a game as rankable or not rankable,
       or to get more information about a game.
-
-
-
     </p>
-    <b-card class="mb-3" no-body>
-      <h4 slot="header">Legend</h4>
+
+    <h4 class="muted float-left" v-show="!showLegend">Legend is hidden</h4>
+    <b-card no-body v-show="showLegend">
+      <h3 slot="header">
+        Legend
+      </h3>
       <b-list-group flush>
-       <b-list-group-item>
-         <prop-button
+        <b-list-group-item>
+          <prop-button
            property="visible"
            :value="true"
            :id="-1" :disabled="true">
-         </prop-button>
-       </b-list-group-item>
-       <b-list-group-item>
-         <prop-button
+          </prop-button>
+        </b-list-group-item>
+        <b-list-group-item>
+          <prop-button
            property="visible"
            :value="false"
            :id="-1" :disabled="true">
-         </prop-button>
-       </b-list-group-item>
-       <b-list-group-item>
-         <prop-button
+          </prop-button>
+        </b-list-group-item>
+        <b-list-group-item>
+          <prop-button
            property="rankable"
            :value="true"
            :id="-1" :disabled="true">
-         </prop-button>
-       </b-list-group-item>
-       <b-list-group-item>
-         <prop-button
+          </prop-button>
+        </b-list-group-item>
+        <b-list-group-item>
+          <prop-button
            property="rankable"
            :value="false"
            :id="-1" :disabled="true">
-         </prop-button>
-       </b-list-group-item>
-       <b-list-group-item>
-         <b-btn variant="info" @click="info(id)" disabled>
-           <icon name="info-circle" aria-hidden></icon>
-         </b-btn>
-         <span>View details</span>
-
-       </b-list-group-item>
-   </b-list-group>
-
+          </prop-button>
+        </b-list-group-item>
+        <b-list-group-item>
+          <b-btn variant="info" @click="info(id)" disabled>
+            <icon name="info-circle" aria-hidden></icon>
+          </b-btn>
+          <span>View game details</span>
+        </b-list-group-item>
+      </b-list-group>
     </b-card>
-    <p>
-      {{viewObj.details}}
-    </p>
+
+    <div class="text-right" s>
+      <b-btn ize="sm" variant="link" @click="toggleLegend()">
+        {{ showLegend ? '- hide' : '+ show' }} legend
+      </b-btn>
+    </div>
+
   </div>
 
 
@@ -107,15 +117,8 @@
 
     <!-- MODALS -->
     <!-- import -->
-    <b-modal
-      id="import"
-      title="Import"
-      ok-only
-      ok-title="Close"
-      ok-variant="secondary"
-      ref="importer">
-      <import @ok="closeImporter()"></import>
-    </b-modal>
+
+    <import></import>
     <!-- make a list -->
     <b-modal
       id="makeList"
@@ -192,7 +195,8 @@ export default {
       playerCountMin: 1,
       playerCountMax: 4,
       playerCountMode: 'includes',
-      newListName: ''
+      newListName: '',
+      showLegend: true
     };
   },
   computed: {
@@ -214,10 +218,11 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setView', 'setFilter', 'clearPCF', 'makeNewList']),
-    closeImporter() {
-      this.$refs.importer.hide();
+    toggleLegend () {
+      console.log('toggle', this.showLegend)
+      this.showLegend = !this.showLegend;
     },
+    ...mapMutations(['setView', 'setFilter', 'clearPCF', 'makeNewList']),
     makeList(name) {
       let listId = this.makeNewList({ name });
       this.$router.go('/list/' + listId);

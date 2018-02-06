@@ -1,11 +1,18 @@
 <template>
-  <div>
+  <b-modal
+    id="import"
+    title="Import"
+    ok-only
+    ok-title="Close"
+    ok-variant="warning"
+    ref="importer"
+    :busy="loading">
     <b-alert :show="message.length" :variant="alertType">
       {{message}}
     </b-alert>
     <spinner v-show="loading"></spinner>
     <div v-show="!loading"
-      @keyup.enter="getCollection()">
+      @keyup.enter="fetch()">
       <div v-show="preImportGames.length < 1">
         <b-form-group>
           <b-input
@@ -15,8 +22,8 @@
             v-model="username"
             placeholder="BGG Username" />
         </b-form-group>
-        <b-button variant="primary" @click="getCollection()">
-          <icon name="download" class="sr-only"></icon> Import
+        <b-button variant="primary" @click="fetch()">
+          <icon name="download" aria-hidden></icon> Import
         </b-button >
       </div>
 
@@ -38,10 +45,10 @@
         </p>
         <b-button @click="merge()" variant="info">Merge</b-button>
         <b-button @click="replace()" variant="danger">Replace</b-button>
-        <b-button @click="importCancel()" variant="warning">Cancel</b-button>
+        <b-button @click="cancel()" variant="warning">Cancel</b-button>
       </div>
     </div>
-  </div>
+  </b-modal>
 </template>
 
 <script>
@@ -69,16 +76,19 @@ export default {
   },
 
   methods: {
-    ...mapMutations(['importMerge', 'importReplace', 'importCancel']),
+    ...mapActions(['importGames', 'getCollection']),
+    cancel() {
+      this.importGames({mode: 'importCancel'});
+    },
     merge() {
-      this.importMerge();
-      this.$emit('ok');
+      this.importGames({mode: 'importMerge'});
+      this.$refs.importer.hide();
     },
     replace() {
-      this.importReplace();
-      this.$emit('ok');
+      this.importGames({mode: 'importReplace'});
+      this.$refs.importer.hide();
     },
-    getCollection(retry = false) {
+    fetch(retry = false) {
       let message = '';
 
       if (retry) this.attempts++;
@@ -89,7 +99,7 @@ export default {
       }
 
       this.loading = true;
-      this.$store.dispatch('getCollection', { username: this.username }).then(
+      this.getCollection(this.username).then(
         response => {
           this.alertType = 'info';
           message = 'Request completed';
@@ -116,7 +126,7 @@ export default {
               let ref = this;
               this.report(message);
               setTimeout(function() {
-                ref.getCollection(true);
+                ref.fetch(true);
               }, 2000);
             } else {
               message = `Request still queued after ${
