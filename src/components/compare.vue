@@ -1,10 +1,18 @@
 <template>
   <div class="base">
     <div class="row no-gutters">
-      <game-compare :id="incumbantGame" :left="true" class="col-6">
-      </game-compare>
-      <game-compare :id="challengerGame" :left="false" class="col-6">
-      </game-compare>
+      <div @click="pick(incumbantGame)" class="col-6">
+        <game-compare
+          :id="incumbantGame"
+          :left="true">
+        </game-compare>
+      </div>
+      <div @click="pick(challengerGame)" class="col-6">
+        <game-compare
+          :id="challengerGame"
+          :left="false">
+        </game-compare>
+      </div>
     </div>
   </div>
 </template>
@@ -15,8 +23,15 @@ import Icon from 'vue-awesome';
 
 export default {
   name: 'Compare',
-  components: {GameCompare},
-  props: {incumbantGame: Number, challengerGame: Number}
-}
+  components: { GameCompare },
+  props: { incumbantGame: Number, challengerGame: Number },
+  methods: {
+    pick(id) {
+      this.$emit('pick', id);
+    }
+  }
+};
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+
+</style>

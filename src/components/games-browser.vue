@@ -17,8 +17,21 @@
         <game
           :key="game.id"
           :id="game.gameId"
-          :name="game.name"
           class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap">
+          <div v-if="ranking" slot="controls">
+            <b-btn size="sm" variant="primary" @click="setrank(game.gameId)">
+              <icon name="angle-double-up" aria-hidden></icon>
+              <span class="sr-only">set rank</span>
+            </b-btn>
+            <b-btn size="sm" variant="danger" @click="dropgame(game.gameId)">
+              <icon name="close" aria-hidden></icon>
+              <span class="sr-only">drop game</span>
+            </b-btn>
+            <b-btn size="sm" variant="info" :to="'/game/'+game.gameId">
+              <icon name="info-circle" aria-hidden></icon>
+              <span class="sr-only">view details for {{game.name}}</span>
+            </b-btn>
+          </div>
         </game>
       </template>
     </div>
@@ -43,11 +56,12 @@
 import Game from './game.vue';
 import PageControls from './page-controls.vue';
 import { mapGetters } from 'vuex';
+import Icon from 'vue-awesome';
 
 export default {
   name: 'GamesBrowser',
 
-  components: { Game, PageControls },
+  components: { Game, PageControls, Icon },
 
   data() {
     return {
@@ -62,6 +76,9 @@ export default {
     ...mapGetters({
       perPage: 'getPerPage'
     }),
+    ranking() {
+      return this.ids ? true : false;
+    },
     pages() {
       if (this.ids) {
         return Math.ceil(this.ids.length / this.perPage);
@@ -83,6 +100,12 @@ export default {
   },
 
   methods: {
+    setrank(id) {
+      this.$emit('setrank', id);
+    },
+    dropgame(id) {
+      this.$emit('dropgame', id);
+    },
     setPage(p) {
       this.page = p;
     },
@@ -99,9 +122,7 @@ export default {
 </script>
 
 <style lang="scss">
-
 .game-wrap {
   padding: 1rem;
 }
-
 </style>

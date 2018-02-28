@@ -3,6 +3,7 @@
     <library></library>
   </div>
 </template>
+
 <script>
 import { mapGetters } from 'vuex';
 import Library from '../components/library.vue';
@@ -15,4 +16,6 @@ export default {
   }
 };
 </script>
-<style lang="scss"></style>
+
+<style lang="scss">
+</style>

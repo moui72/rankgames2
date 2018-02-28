@@ -34,16 +34,19 @@
             @keyup.esc.native="cancelRename()"
             ></b-form-input>
           <h2 v-show="!editingName">
-            <b-link @click="$router.go(-1)">Lists</b-link> &raquo; "{{data.name}}"
+            <b-link to="/lists">Lists</b-link> &raquo; "{{data.name}}"
           </h2>
         </div>
       </div>
+      <b-btn @click="newPair">new comparison</b-btn>
     </div>
-    <h3 class="base mt-3 p-3">Choose</h3>
+    <div v-if="incumbant && challenger">
+      <h3 class="base mt-3 p-3">Choose</h3>
 
-    <div>
       <!-- comparisons -->
-      <compare :incumbantGame="incumbantGame" :challengerGame="challengerGame"></compare>
+      <compare
+        :incumbantGame="incumbant" :challengerGame="challenger" @pick="pick">
+      </compare>
     </div>
     <div>
       <!-- ranked -->
@@ -53,57 +56,127 @@
         <template v-if="data.list && data.list.length > 1"  >
           <b-list-group-item v-for="game in data.list" :key="game">
             <p>
-              {{game}}
+              {{getGame(game).name}}
             </p>
           </b-list-group-item>
         </template>
 
-        <b-list-group-item>
+        <b-list-group-item v-if="!data.list || data.list.length < 1">
           No ranked games yet.
         </b-list-group-item>
       </b-list-group>
     </div>
     <!-- games browser -->
     <h3 class="base mt-3 p-3">Unranked games</h3>
-    <games-browser :ids="data.games" class="mb-3"></games-browser>
+    <games-browser :ids="unranked" class="mb-3" @setrank="setrank" @drop="drop"></games-browser>
   </div>
 
 </template>
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import Game from '../components/game.vue';
 import GamesBrowser from './games-browser.vue';
 import Compare from './compare.vue';
 import Icon from 'vue-awesome';
+import * as _ from 'lodash';
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export default {
   name: 'List',
   data() {
     return {
       editingName: false,
       newName: '',
-      msg: ''
+      msg: '',
+      challengerID: 0,
+      incumbantIndex: 0
     };
   },
   props: { id: Number },
   components: { Icon, Game, GamesBrowser, Compare },
   computed: {
     ...mapGetters(['getList', 'getGame']),
+    unranked() {
+      return _.difference(this.data.games, this.ranked);
+    },
+    ranked() {
+      return this.data.list;
+    },
     data() {
       return this.getList(this.id);
     },
     incumbantGame() {
-      return this.data.games[0]
+      return this.incumbant;
     },
     challengerGame() {
-      return this.data.games[1]
+      return this.challenger;
+    },
+    incumbant() {
+      return this.data.list[this.incumbantIndex];
+    },
+    challenger() {
+      return this.challengerID;
     }
   },
   methods: {
+    ...mapActions(['setrankto', 'renameList', 'dropGameInList']),
+    getIncumbant() {
+      this.incumbantIndex = 0;
+      if (this.data.list.length < 1) {
+        this.setrank(this.unranked[0], 1);
+      } else if (this.data.list.length > 3) {
+        this.incumbantIndex = Math.floor(
+          this.ranked.length / 2 + randomInt(-1, 1)
+        );
+      }
+      return this.incumbantIndex;
+    },
+    nextIncumbant() {
+      if (this.incumbantIndex < 1) {
+        this.setrank(this.challenger, 0);
+        this.newPair();
+      } else {
+        this.incumbantIndex -= 1;
+      }
+    },
+    getChallenger() {
+      if (this.unranked.length < 2) {
+        return this.unranked[0];
+      }
+      this.challengerID = this.unranked[randomInt(0, this.unranked.length)];
+      return this.challengerID;
+    },
+    newPair() {
+      console.log(this.challenger, this.incumbantIndex);
+      this.getIncumbant();
+      this.getChallenger();
+    },
+    pick(id) {
+      if (id === this.incumbantGame) {
+        console.log('incumbant picked');
+        this.setrank(this.challenger, this.incumbantIndex + 1);
+        this.newPair();
+      } else {
+        console.log('challenger picked');
+        this.nextIncumbant();
+      }
+    },
+    setrank(id, rank) {
+      rank = rank || 0;
+      console.log('setrank (id, rank)', id, rank);
+      this.setrankto({ listid: this.id, game: id, rank: rank });
+    },
+    drop(id) {
+      this.dropGameInList({ listid: this.id, game: id });
+      console.log('drop', id);
+    },
     gameData(id) {
       console.log(id, this.getGame(id));
       return this.getGame(id);
     },
-    ...mapMutations(['renameList']),
     rename() {
       if (this.newName.trim() == '')
         return this.cancelRename('list must have a name');
@@ -120,8 +193,12 @@ export default {
       }
       this.editingName = false;
     }
+  },
+  created() {
+    this.newPair();
   }
 };
 </script>
 <style lang="scss">
+
 </style>

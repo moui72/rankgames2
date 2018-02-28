@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-card
-      class="game my-3"
+      class="base game my-3"
       header-bg-variant="dark"
       header-text-variant="light"
       header-tag="header"
@@ -11,7 +11,7 @@
       footer-tag="footer"
       >
       <header slot="header" class="row">
-        <div class="col-8">
+        <div class="col-6 col-sm-8">
           <span class="game-name">{{game.name}}</span>
           <b-badge
             :href="'http://boardgamegeek.com/thing/'+id"
@@ -19,19 +19,24 @@
             class="ml-1 align-top" variant="light" size="sm">{{id}}
           </b-badge>
         </div>
-        <div class="col-4 text-right">
+        <div class="col-6 col-sm-4 text-right">
           <b-button-group class="align-bottom">
             <template v-for="prop in toggles">
               <prop-button
+                size="sm"
+                class="mr-2"
                 :property="prop"
                 :value="getProp(id, prop)"
                 :id="id">
               </prop-button>
             </template>
-            <b-btn variant="info" @click="close">
-              &times;
-              <span class="sr-only">close "{{game.name}}" details screen</span>
-            </b-btn>
+            <div class="">
+              <b-btn variant="info" @click="close">
+                &times;
+                <span class="sr-only">close "{{game.name}}" details screen</span>
+              </b-btn>
+            </div>
+
           </b-button-group>
         </div>
 
@@ -64,17 +69,21 @@
         <b-button-group class="mx-auto align-bottom">
           <template v-for="prop in toggles">
             <prop-button
+            class="mx-1"
             size="lg"
             :property="prop"
             :value="getProp(id, prop)"
             :id="id">
           </prop-button>
         </template>
-        <b-btn variant="info" @click="close">
-          &times;
-          <span aria-hidden>Close</span>
-          <span class="sr-only">close "{{game.name}}" details screen</span>
-        </b-btn>
+        <div class="mx-1">
+          <b-btn variant="info" @click="close">
+            &times;
+            <span aria-hidden>Close</span>
+            <span class="sr-only">close "{{game.name}}" details screen</span>
+          </b-btn>
+        </div>
+
       </b-button-group>
       </div>
     </b-card>
@@ -138,11 +147,22 @@ export default {
 </script>
 <style lang="scss">
 .game {
+  overflow: hidden;
   .game-name{
     font-size: 1.5rem;
   }
   .badge {
     font-size: .675rem;
+  }
+  img {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 30vh;
+    display: block;
+    width: 100%;
+    self-align: flex-start;
+    object-fit: cover;
+    object-position: 0 50%;
   }
   label{
     margin: 0;
