@@ -58,6 +58,9 @@
             <p>
               {{getGame(game).name}}
             </p>
+            <b-btn variant="danger" @click="setrank(game, -1)">&times;
+              <span class="sr-only">Remove this game's rank</span>
+            </b-btn>
           </b-list-group-item>
         </template>
 
@@ -68,7 +71,11 @@
     </div>
     <!-- games browser -->
     <h3 class="base mt-3 p-3">Unranked games</h3>
-    <games-browser :ids="unranked" class="mb-3" @setrank="setrank" @drop="drop"></games-browser>
+    <games-browser
+      :ids="unranked"
+      class="mb-3"
+      @setrank="setrank"
+      @drop="drop"></games-browser>
   </div>
 
 </template>
@@ -166,7 +173,6 @@ export default {
     },
     setrank(id, rank) {
       rank = rank || 0;
-      console.log('setrank (id, rank)', id, rank);
       this.setrankto({ listid: this.id, game: id, rank: rank });
     },
     drop(id) {

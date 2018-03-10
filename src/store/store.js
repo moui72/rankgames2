@@ -206,7 +206,9 @@ const actions = {
     let list = getters.getList(listid);
     let currentRank = list.list.indexOf(game);
     if (currentRank > 0) commit('unrank', { list, game, rank: currentRank });
-    commit('setRank', { list, rank, game });
+    if (rank && rank >= 0) {
+      commit('setRank', { list, rank, game });
+    }
     commit('listUpdated', { list });
   },
   importGames({ commit }, mode) {

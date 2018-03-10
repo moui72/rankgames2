@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <div class="widget my-3">
       <h2>Your lists</h2>
       <b-button-toolbar class="mt-3">
@@ -94,4 +93,5 @@ export default {
 };
 </script>
 <style lang="scss">
+
 </style>

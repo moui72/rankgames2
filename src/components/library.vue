@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container-fluid my-3 header widget">
+    <div class="my-3 header widget">
       <!-- header -->
       <b-row>
         <b-col>
@@ -218,8 +218,8 @@ export default {
     }
   },
   methods: {
-    toggleLegend () {
-      console.log('toggle', this.showLegend)
+    toggleLegend() {
+      console.log('toggle', this.showLegend);
       this.showLegend = !this.showLegend;
     },
     ...mapMutations(['setView', 'setFilter', 'clearPCF', 'makeNewList']),
@@ -244,9 +244,7 @@ export default {
 </script>
 
 <style lang="scss">
-
 .game-wrap {
   padding: 1rem;
 }
-
 </style>
