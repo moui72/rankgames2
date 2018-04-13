@@ -1,13 +1,15 @@
 <template>
-  <div :class="{gc: true, left: left, right: !left}">
-    <vue-img-loader
-      :alt="'Image of box cover for ' + name"
-      :src="image"
-      class="border-primary bgimg"
-      height="400"
-    />
-    <h2 class="name">{{name}}</h2>
-  </div>
+
+    <div :class="{gc: true, left: left, right: !left}">
+      <img
+        :alt="'Image of box cover for ' + name"
+        :src="image"
+        class="border-primary bgimg"
+        height="400"
+      />
+      <h2 class="name">{{name}}</h2>
+    </div>
+  </transition>
 </template>
 <script>
 import { mapGetters } from 'vuex';
@@ -49,7 +51,6 @@ export default {
 </script>
 <style lang="scss">
 .gc {
-  background-color: #005;
   border-radius: 0.2rem;
   position: relative;
   overflow: hidden;
@@ -88,7 +89,6 @@ export default {
     width: 100%;
     self-align: flex-start;
     object-fit: cover;
-    opacity: 0.85;
   }
 }
 </style>

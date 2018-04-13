@@ -1,17 +1,34 @@
 <template>
   <div class="base">
-    <div class="row no-gutters">
-      <div @click="pick(incumbantGame)" class="col-6">
-        <game-compare
-          :id="incumbantGame"
-          :left="true">
-        </game-compare>
+    <div class="row no-gutters compares">
+      <div @click="pickIncumbant()" class="col-6">
+        <transition
+          appear
+          name="next-game"
+          mode="out-in"
+          enter-active-class="animated rotateInUpLeft"
+          leave-active-class="animated rotateOutDownLeft">
+          <game-compare
+            :key="incumbantGame"
+            :id="incumbantGame"
+            left>
+          </game-compare>
+        </transition>
       </div>
-      <div @click="pick(challengerGame)" class="col-6">
-        <game-compare
-          :id="challengerGame"
-          :left="false">
-        </game-compare>
+      <div @click="pickChallenger()" class="col-6">
+        <transition
+          appear
+          name="next-game"
+          mode="out-in"
+          enter-active-class="animated rotateInDownRight"
+          leave-active-class="animated rotateOutUpRight">
+          <game-compare
+            mode="out-in"
+            :key="challengerGame"
+            :id="challengerGame">
+          </game-compare>
+        </transition>
+
       </div>
     </div>
   </div>
@@ -26,6 +43,12 @@ export default {
   components: { GameCompare },
   props: { incumbantGame: Number, challengerGame: Number },
   methods: {
+    pickIncumbant() {
+      this.pick(this.incumbantGame);
+    },
+    pickChallenger() {
+      this.pick(this.challengerGame);
+    },
     pick(id) {
       this.$emit('pick', id);
     }
@@ -33,5 +56,10 @@ export default {
 };
 </script>
 <style lang="scss">
-
+.animated {
+  animation-duration: 0.5s;
+}
+.compares {
+  background-color: #666;
+}
 </style>

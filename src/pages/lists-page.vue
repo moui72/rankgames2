@@ -62,7 +62,7 @@
 
 </template>
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 import Library from '../components/library.vue';
 import Icon from 'vue-awesome';
 
@@ -70,24 +70,33 @@ export default {
   name: 'Lists',
   data: () => {
     return {
-      newListName: 'some list'
+      newListName: 'some list',
+      byDate: false
     };
   },
   components: { Icon },
   computed: {
-    ...mapGetters({ lists: 'getLists' }),
-    ...mapGetters(['rankableGames']),
+    ...mapGetters(['getLists', 'rankableGames']),
+    lists() {
+      if (this.byDate) return this.listsByDate;
+      return this.listsById;
+    },
+    listsById() {
+      return this.getLists.sort((a, b) => {
+        return a.id - b.id;
+      });
+    },
     listsByDate() {
-      return this.lists.sort(function(a, b) {
+      return this.getLists.sort(function(a, b) {
         return a.created - b.created;
       });
     }
   },
   methods: {
-    ...mapMutations(['makeNewList', 'purgeLists', 'deleteList']),
+    ...mapMutations(['purgeLists', 'deleteList']),
+    ...mapActions(['makeNewList']),
     makeList(name) {
       let listId = this.makeNewList({ name });
-      this.$router.go('/list/' + listId);
     }
   }
 };

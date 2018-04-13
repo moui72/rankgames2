@@ -186,13 +186,9 @@ const getters = {
 };
 
 const actions = {
-  renameList({ commit, state }, { id, newName }) {
+  renameList({ commit, state, dispatch }, { listid, newName }) {
     commit('renameList', { id, newName });
-    commit('listUpdated', {
-      list: state.lists.find(list => {
-        return list.id === id;
-      })
-    });
+    dispatch('listUpdated', { listid });
   },
   /**
    * Sets the rank of game in list to given rank, clearing any prior ranking.
@@ -202,17 +198,14 @@ const actions = {
    * @param  {Number}   game   gameId of game
    * @param  {Number}   rank   rank to give game
    */
-  setrankto({ commit, state, getters }, { listid, game, rank }) {
+  setrankto({ commit, dispatch, state, getters }, { listid, game, rank }) {
     let list = getters.getList(listid);
     let currentRank = list.list.indexOf(game);
-    if (currentRank > 0) commit('unrank', { list, game, rank: currentRank });
-    if (rank && rank >= 0) {
+    if (currentRank >= 0) commit('unrank', { list, game, rank: currentRank });
+    if (rank >= 0) {
       commit('setRank', { list, rank, game });
     }
-    commit('listUpdated', { list });
-  },
-  importGames({ commit }, mode) {
-    commit(mode);
+    dispatch('listUpdated', { listid });
   },
   getCollection({ commit }, username) {
     console.log(username);
@@ -241,8 +234,8 @@ const actions = {
         });
     });
   },
-  makeNewList({ commit }, payload) {
-    state.lists.sort(function(a, b) {
+  makeNewList({ state, commit }, { name }) {
+    state.lists.sort((a, b) => {
       return a.id - b.id;
     });
     let nextId = state.lists.length;
@@ -254,7 +247,7 @@ const actions = {
     let ids = state.games.map(game => game.gameId);
     console.log(ids);
     commit('newList', {
-      name: payload.name,
+      name: name,
       games: ids,
       created: Date.now(),
       modified: Date.now(),
@@ -262,20 +255,43 @@ const actions = {
       list: []
     });
   },
-  dropGameInList({ commit, state, getters }, { listid, game }) {
+  dropGameInList({ commit, dispatch, state, getters }, { listid, game }) {
     let list = getters.getList(listid);
     let index = list.games.indexOf(game);
     commit('dropGameFromList', { list, index, game });
-    commit('listUpdated', { list });
+    dispatch('listUpdated', { listid });
+  },
+  /**
+   * Removes duplicates and updates date modified
+   * @param  {[type]} commit  Vuex commit
+   * @param  {[type]} state   Vuex store state
+   * @param  {[type]} getters Vuex store getters
+   * @param  {[type]} listid  id of list that is being updated
+   */
+  listUpdated({ commit, state, getters }, { listid }) {
+    console.log('listupdated: ', listid);
+    let list = getters.getList(listid);
+    // commit('dedupe', { list });
+    commit('modified', { list });
   }
 };
 
 const mutations = {
+  /**
+   * debug method for removing duplicates.
+   * @param  {[type]} state [description]
+   * @param  {[type]} list  [description]
+   * @return {[type]}       [description]
+   */
+  dedupe(state, { list }) {
+    list.list = _.uniq(list.list);
+    list.games = _.uniq(list.games);
+  },
   dropGameFromList(state, { list, index, game }) {
     if (list.games[index] == game) list.games.splice(index, 1);
     else throw Exception('Game is not at given index.');
   },
-  listUpdated(state, { list }) {
+  modified(state, { list }) {
     list.modifed = Date.now();
   },
   /**
@@ -312,7 +328,7 @@ const mutations = {
       return list.id !== payload.id;
     });
   },
-  makeNewList(state, list) {
+  newList(state, list) {
     state.lists.push(list);
   },
   clearPCF(state) {
