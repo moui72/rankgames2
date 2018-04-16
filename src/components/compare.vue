@@ -3,11 +3,11 @@
     <div class="row no-gutters compares">
       <div @click="pickIncumbant()" class="col-6">
         <transition
-          appear
           name="next-game"
           mode="out-in"
-          enter-active-class="animated rotateInUpLeft"
-          leave-active-class="animated rotateOutDownLeft">
+          class="ranked-games-list"
+          enter-active-class="animated zoomIn"
+          leave-active-class="animated zoomOut">
           <game-compare
             :key="incumbantGame"
             :id="incumbantGame"
@@ -17,11 +17,10 @@
       </div>
       <div @click="pickChallenger()" class="col-6">
         <transition
-          appear
           name="next-game"
           mode="out-in"
-          enter-active-class="animated rotateInDownRight"
-          leave-active-class="animated rotateOutUpRight">
+          enter-active-class="animated zoomIn"
+          leave-active-class="animated zoomOut">
           <game-compare
             mode="out-in"
             :key="challengerGame"

@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <div class="game-box">
       <div class="img-wrap">
@@ -45,7 +46,9 @@
       </div>
     </div>
   </div>
+
 </template>
+
 <script>
 import { mapGetters } from 'vuex';
 import PropButton from './prop-button.vue';
@@ -83,8 +86,6 @@ export default {
   },
   methods: {
     info: function(id) {
-      console.log(id);
-      console.log(this.getGame(id));
       this.$router.push('/game/' + id);
     }
   }
@@ -97,33 +98,33 @@ export default {
   height: 100%;
   width: 100%;
   padding: 0 0 1rem 0;
-  box-shadow: 0px 0px 20px rgba(0,0,0,.9);
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.9);
   background-color: white;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
 
-  .img-wrap{
-    border-top-left-radius: .2rem;
-    border-top-right-radius: .2rem;
+  .img-wrap {
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
   }
 
-  >div {
+  > div {
     display: table-row;
-    >div {
+    > div {
       display: table-cell;
       vertical-align: middle;
 
-      &:last-child{
+      &:last-child {
         vertical-align: bottom;
       }
     }
   }
-  h3{
+  h3 {
     width: 100%;
     font-size: 1.3rem;
   }
   img {
-    border-top-left-radius: .2rem;
-    border-top-right-radius: .2rem;
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
     display: block;
     border-bottom: 1rem solid;
     width: 100%;
@@ -131,8 +132,6 @@ export default {
     object-fit: cover;
     object-position: 50% 0;
     max-height: 170px;
-
   }
 }
-
 </style>

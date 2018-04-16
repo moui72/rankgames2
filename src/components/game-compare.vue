@@ -31,19 +31,22 @@ export default {
   computed: {
     ...mapGetters(['toggles', 'getProp', 'getGame']),
     name() {
+      if(!this.id)
+        return "loading"
       return this.getGame(this.id).name;
     },
     image() {
+      if(!this.id) return '';
       return this.getProp(this.id, 'image');
     },
     thumb() {
+      if(!this.id) return '';
       return this.getProp(this.id, 'thumbnail');
     }
   },
   methods: {
     info: function(id) {
-      console.log(id);
-      console.log(this.getGame(id));
+      if (!this.id) return;
       this.$router.push('/game/' + id);
     }
   }

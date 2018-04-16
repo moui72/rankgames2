@@ -14,25 +14,32 @@
       <!-- games list -->
     <div v-if="list.length" class="row my-1">
       <template v-for="(game, index) in list">
-        <game
-          :key="game.id"
-          :id="game.gameId"
-          class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap">
-          <div v-if="ranking" slot="controls">
-            <b-btn size="sm" variant="primary" @click="setrank(game.gameId)">
-              <icon name="angle-double-up" aria-hidden></icon>
-              <span class="sr-only">set rank</span>
-            </b-btn>
-            <b-btn size="sm" variant="danger" @click="dropgame(game.gameId)">
-              <icon name="close" aria-hidden></icon>
-              <span class="sr-only">drop game</span>
-            </b-btn>
-            <b-btn size="sm" variant="info" :to="'/game/'+game.gameId">
-              <icon name="info-circle" aria-hidden></icon>
-              <span class="sr-only">view details for {{game.name}}</span>
-            </b-btn>
-          </div>
-        </game>
+        <transition name="game-list"
+          appear
+          mode="out-in"
+          enter-active-class="animated bounceIn"
+          leave-active-class="animated zoomOut"
+          :duration="{enter: 300, leave: 200}">
+          <game
+            :key="game.gameId"
+            :id="game.gameId"
+            class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap">
+            <div v-if="ranking" slot="controls">
+              <b-btn size="sm" variant="primary" @click="setrank(game.gameId)">
+                <icon name="angle-double-up" aria-hidden></icon>
+                <span class="sr-only">set rank</span>
+              </b-btn>
+              <b-btn size="sm" variant="danger" @click="dropgame(game.gameId)">
+                <icon name="close" aria-hidden></icon>
+                <span class="sr-only">drop game</span>
+              </b-btn>
+              <b-btn size="sm" variant="info" :to="'/game/'+game.gameId">
+                <icon name="info-circle" aria-hidden></icon>
+                <span class="sr-only">view details for {{game.name}}</span>
+              </b-btn>
+            </div>
+          </game>
+        </transition>
       </template>
     </div>
     <div v-show="list.length < 1"
