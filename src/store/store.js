@@ -207,6 +207,12 @@ const actions = {
     }
     dispatch('listUpdated', { listid });
   },
+  /**
+   * 
+   * @param {function} commit Vue context.commit 
+   * @param string username 
+   * @return promise  Resolves array of game objects
+   */
   getCollection({ commit }, username) {
     console.log(username);
     return new Promise((resolve, reject) => {
@@ -255,6 +261,12 @@ const actions = {
       list: []
     });
   },
+  /**
+   * 
+   * 
+   * @param {Object} { commit, dispatch, state, getters } Vuex state methods
+   * @param {Object} { listid, game }
+   */
   dropGameInList({ commit, dispatch, state, getters }, { listid, game }) {
     let list = getters.getList(listid);
     let index = list.games.indexOf(game);
@@ -263,10 +275,10 @@ const actions = {
   },
   /**
    * Removes duplicates and updates date modified
-   * @param  {[type]} commit  Vuex commit
-   * @param  {[type]} state   Vuex store state
-   * @param  {[type]} getters Vuex store getters
-   * @param  {[type]} listid  id of list that is being updated
+   * @param  {Function} commit  Vuex commit
+   * @param  {Object}   state   Vuex store state
+   * @param  {Object}   getters Vuex store getters
+   * @param  {Number}   listid  id of list that is being updated
    */
   listUpdated({ commit, state, getters }, { listid }) {
     console.log('listupdated: ', listid);
@@ -278,15 +290,22 @@ const actions = {
 
 const mutations = {
   /**
-   * debug method for removing duplicates.
-   * @param  {[type]} state [description]
-   * @param  {[type]} list  [description]
-   * @return {[type]}       [description]
+   * Removes duplicate games from ranked and unranked set in list
+   * 
+   * @param {any} state
+   * @param {any} { list }
    */
   dedupe(state, { list }) {
     list.list = _.uniq(list.list);
     list.games = _.uniq(list.games);
   },
+  /**
+   * dropGameFromList removes the indicate game (game) from the given rank 
+   * (index) of the ranked set for the indicated list (id)
+   * 
+   * @param {any} state 
+   * @param {any} { list, index, game } 
+   */
   dropGameFromList(state, { list, index, game }) {
     if (list.games[index] == game) list.games.splice(index, 1);
     else throw Exception('Game is not at given index.');
