@@ -20,14 +20,17 @@
       <b-button-group class="mr-3">
         <b-dropdown :text="'Current view: ' + viewObj.text" variant="info">
           <template v-for="(view, name) in viewObjs">
-            <b-dropdown-item @click="setView(name)" :title="view.description">
+            <b-dropdown-item
+              @click="setView(name)"
+              :title="view.description"
+              :key="name">
               {{view.text}}
             </b-dropdown-item>
           </template>
         </b-dropdown>
         <b-dropdown text="Add a filter" variant="warning">
           <template v-for="(filter, name) in filters">
-            <b-dd-item v-if="filter.simple" @click="setFilter(name)">
+            <b-dd-item v-if="filter.simple" @click="setFilter(name)" :key="name">
               {{activeFilters.indexOf(name) >= 0 ?
                 'Stop ignoring' : 'Ignore'}} {{filter.text}}
               </b-dd-item>

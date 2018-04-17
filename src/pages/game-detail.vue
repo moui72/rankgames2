@@ -23,6 +23,7 @@
           <b-button-group class="align-bottom">
             <template v-for="prop in toggles">
               <prop-button
+                :key="prop"
                 size="sm"
                 class="mr-2"
                 :property="prop"
@@ -54,7 +55,7 @@
       </div>
       <b-list-group>
         <template v-for="(value, property) in gameInfo">
-          <b-list-group-item v-if="value && value != -1" class="row"
+          <b-list-group-item :key="property" v-if="value && value != -1" class="row"
             :variant="variant(property, value)">
             <label>
               {{property}}
@@ -69,11 +70,12 @@
         <b-button-group class="mx-auto align-bottom">
           <template v-for="prop in toggles">
             <prop-button
-            class="mx-1"
-            size="lg"
-            :property="prop"
-            :value="getProp(id, prop)"
-            :id="id">
+              :key="prop"
+              class="mx-1"
+              size="lg"
+              :property="prop"
+              :value="getProp(id, prop)"
+              :id="id">
           </prop-button>
         </template>
         <div class="mx-1">

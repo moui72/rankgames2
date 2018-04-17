@@ -78,12 +78,13 @@
       </b-pagination>
       <b-list-group class="base mb-2" v-if="data.list && data.list.length > 1">
 
-        <template v-for="game in pagedRanked">
-          <transition
-            name="next-game"
-            mode="out-in"
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut" :duration="{out: 200, in: 400}">
+        <transition-group
+          name="next-game"
+          mode="out-in"
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut" :duration="{out: 200, in: 400}">
+          <template v-for="game in pagedRanked">
+
             <b-list-group-item
               :key="game"
               class="ranked-game-item">
@@ -112,8 +113,8 @@
                 </div>
               </div>
             </b-list-group-item>
-          </transition>
-        </template>
+          </template>
+        </transition-group>
 
         <b-list-group-item v-if="!data.list || data.list.length < 1">
           No ranked games yet.
@@ -138,24 +139,24 @@
 
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex';
-import Game from '../components/game.vue';
-import GamesBrowser from './games-browser.vue';
-import Compare from './compare.vue';
-import Icon from 'vue-awesome';
-import * as _ from 'lodash';
+import { mapGetters, mapActions } from "vuex";
+import Game from "../components/game.vue";
+import GamesBrowser from "./games-browser.vue";
+import Compare from "./compare.vue";
+import Icon from "vue-awesome";
+import * as _ from "lodash";
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export default {
-  name: 'List',
+  name: "List",
   data() {
     return {
       editingName: false,
-      newName: '',
-      msg: '',
+      newName: "",
+      msg: "",
       challengerID: 0,
       incumbantIndex: 0,
       rankedPage: 1,
@@ -168,7 +169,7 @@ export default {
   props: { id: Number },
   components: { Icon, Game, GamesBrowser, Compare },
   computed: {
-    ...mapGetters(['getList', 'getGame']),
+    ...mapGetters(["getList", "getGame"]),
     unranked() {
       return _.difference(this.data.games, this.ranked);
     },
@@ -195,7 +196,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setrankto', 'renameList', 'dropGameInList']),
+    ...mapActions(["setrankto", "renameList", "dropGameInList"]),
     rankOf(gameId) {
       return (
         this.ranked.findIndex(el => {
@@ -207,7 +208,7 @@ export default {
       this.unrankedCached = false;
       this.cacheImgs().then(r => {
         this.unrankedCached = true;
-      })
+      });
       if (this.unranked.length > 0) {
         this.challengerID = this.unranked[0];
       } else {
@@ -224,7 +225,7 @@ export default {
           this.ranked.length / 2 + randomInt(-1, 1)
         );
       }
-      this.cacheImg(this.incumbant)
+      this.cacheImg(this.incumbant);
       return this.incumbantIndex;
     },
     nextIncumbant() {
@@ -239,17 +240,16 @@ export default {
       let imgsReady = 0;
       this.getIncumbant();
       this.getChallenger();
-      try{
+      try {
         this.cacheImg(this.challenger)
           .then(i => this.imgReady(this.challenger, i))
-          .catch(e => this.cacheImgFail(this.challenger,e));
+          .catch(e => this.cacheImgFail(this.challenger, e));
         this.cacheImg(this.incumbant)
           .then(i => this.imgReady(this.incumbant, i))
-          .catch(e => this.cacheImgFail(this.incumbant,e));
-
-      } catch(e) {
+          .catch(e => this.cacheImgFail(this.incumbant, e));
+      } catch (e) {
         console.error("Invalid incumbant or challenger. Retrying.");
-        this.setTimeout(this.newPair, 500)
+        this.setTimeout(this.newPair, 500);
       }
     },
     pick(id) {
@@ -271,8 +271,8 @@ export default {
       return this.getGame(id);
     },
     rename() {
-      if (this.newName.trim() == '')
-        return this.cancelRename('list must have a name');
+      if (this.newName.trim() == "")
+        return this.cancelRename("list must have a name");
       this.renameList({ id: this.id, newName: this.newName });
       this.editingName = false;
     },
@@ -287,17 +287,21 @@ export default {
       this.editingName = false;
     },
     imgIsReady(id) {
-      console.log(this.imageCache[id])
-      if (!typeof this.imageCache[id] == 'undefined' && this.imageCache[id].ready) {
+      console.log(this.imageCache[id]);
+      if (
+        !typeof this.imageCache[id] == "undefined" &&
+        this.imageCache[id].ready
+      ) {
         return true;
       }
       return false;
     },
     cacheImg(id) {
-      if (id === 0) throw new RangeError("cacheImg got invalid game id ("+id+")", 282)
+      if (id === 0)
+        throw new RangeError("cacheImg got invalid game id (" + id + ")", 282);
       this.$set(this.imageCache, id, { ready: false });
       return new Promise((resolve, reject) => {
-        if (typeof this.gameData(id) == 'undefined') {
+        if (typeof this.gameData(id) == "undefined") {
           reject(id);
         }
         if (!this.imageCache[id] || !this.imageCache[id].ready) {
@@ -311,7 +315,7 @@ export default {
             reject(e);
           }
         } else {
-          console.log('ready already', id)
+          console.log("ready already", id);
         }
       });
     },
@@ -328,10 +332,10 @@ export default {
                 let waiting = setInterval(() => {
                   if (preloaded == n) {
                     clearInterval(waiting);
-                    resolve('preloaded ' + n + ' images');
+                    resolve("preloaded " + n + " images");
                   } else if (wait < 1) {
                     clearInterval(waiting);
-                    reject('timeout', wait * duration);
+                    reject("timeout", wait * duration);
                   }
                   wait--;
                 }, duration);
@@ -339,7 +343,7 @@ export default {
               this.imgReady(this.unranked[i], imgObj);
             })
             .catch(err => {
-              console.log('error:', err)
+              console.log("error:", err);
               this.cacheImgFail(this.unranked[i], err);
               reject(err);
             });
@@ -350,31 +354,30 @@ export default {
       let cached = 0;
       for (let i = 0; i < this.ranked.length; i++) {
         let ico = this.imageCache[this.ranked[i]]; // image cache object
-        if (typeof ico == 'undefined' || !ico.ready) {
+        if (typeof ico == "undefined" || !ico.ready) {
           this.cacheImg(this.ranked[i]).then(r => {
             cached++;
-            console.log('r', r)
-            console.log('ranked cached', cached, '/', this.ranked.length)
+            console.log("r", r);
+            console.log("ranked cached", cached, "/", this.ranked.length);
             if (cached == this.ranked.length) {
               this.rankedCached = true;
             }
           });
         } else {
           cached++;
-          console.log('ranked cached', cached, '/', this.ranked.length)
+          console.log("ranked cached", cached, "/", this.ranked.length);
           if (cached == this.ranked.length) {
             this.rankedCached = true;
           }
         }
-
       }
     },
     cacheImgFail(id, imgObj) {
-      console.log('failed to cache', id, imgObj);
+      console.log("failed to cache", id, imgObj);
       this.$set(this.imageCache, id, { img: imgObj, ready: false });
     },
     imgReady(id, imgObj) {
-      console.log('cached', id);
+      console.log("cached", id);
       this.$set(this.imageCache, id, { img: imgObj, ready: true });
     }
   },
@@ -384,11 +387,14 @@ export default {
       this.unrankedCached = true;
       let caching = setInterval(() => {
         this.cacheImgs().then(() => {
-          if (this.ranked.length + this.unranked.length == Object.keys(this.imageCache).length) {
-            console.log('done caching ' +cached+' images');
+          if (
+            this.ranked.length + this.unranked.length ==
+            Object.keys(this.imageCache).length
+          ) {
+            console.log("done caching " + cached + " images");
             clearInterval(caching);
           }
-        })
+        });
       }, 3000);
     });
     this.cacheRanked();

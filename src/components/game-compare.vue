@@ -1,5 +1,4 @@
 <template>
-
     <div :class="{gc: true, left: left, right: !left}">
       <img
         :alt="'Image of box cover for ' + name"
@@ -9,7 +8,6 @@
       />
       <h2 class="name">{{name}}</h2>
     </div>
-  </transition>
 </template>
 <script>
 import { mapGetters } from 'vuex';

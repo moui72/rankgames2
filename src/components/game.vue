@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <div class="game-box">
       <div class="img-wrap">
@@ -14,7 +13,6 @@
             blank :alt="'No box cover image available for '+ name"
             :src="thumb" class="border-primary"
             height="170" blank-color="rgba(0,0,0,.15)"/>
-          </slot>
         </slot>
       </div>
       <div>
@@ -28,7 +26,8 @@
             <b-button-group class="mx-auto align-bottom">
               <template v-for="prop in toggles">
                 <prop-button
-                class="mx-1"
+                  :key="prop"
+                  class="mx-1"
                   :property="prop"
                   :value="getProp(id, prop)"
                   :id="id">

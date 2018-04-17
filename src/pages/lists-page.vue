@@ -29,7 +29,7 @@
     </b-modal>
 
     <b-list-group class="my-3 base">
-      <template v-for="list in listsByDate">
+      <template v-for="list in lists">
         <b-list-group-item :key="list.id">
           <div class="mr-2 d-sm-inline-block d-block">
 

@@ -4,6 +4,7 @@
       <h4>active filters</h4>
       <template v-for="filter in getActiveFilters">
         <b-btn
+          :key="filter"
           v-if="filter.substr(0,3) == 'pcf'"
           @click="clearPCF"
           size="sm"
@@ -14,9 +15,10 @@
           {{getFilter('pcf').text}}
           {{pcfArgs(filter)}}
         </b-btn>
-        <b-btn v-else-if="filter.substr(0,2) == 'ur'"></b-btn>
+        <b-btn v-else-if="filter.substr(0,2) == 'ur'" :key="filter"></b-btn>
         <b-btn
           v-else
+          :key="filter"
           @click="setFilter(filter)"
           :title="'remove \'' + getFilter(filter).text + '\' filter'"
           size="sm" variant="danger">
