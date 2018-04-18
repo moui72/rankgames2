@@ -1,4 +1,7 @@
 {
+    "extends": [
+        "plugin:vue/recommended"
+    ],
     "env": {
         "browser": true,
         "commonjs": true,
@@ -6,6 +9,7 @@
         "node": true
     },
     "parserOptions": {
+        "ecmaVersion": 9,
         "ecmaFeatures": {
             "jsx": true
         },

@@ -3,17 +3,19 @@
     <!-- games browser -->
     <!-- top pager -->
     <page-controls
+      v-if="pages > 1"
       id="top-pager"
-      class="widget mt-1"
-      v-show="pages > 1"
-      :pages="pages"
       :page="page"
+      :pages="pages"
+      class="widget mt-1"
       @pageChange="setPage"
       @next="nextPage"
-      @prev="prevPage"></page-controls>
-      <!-- games list -->
+      @prev="prevPage"
+    />
+    <!-- games list -->
     <div v-if="list.length">
       <transition-group 
+        :duration="{enter: 300, leave: 200}"
         tag="div"
         name="game-list"
         appear
@@ -21,25 +23,43 @@
         enter-active-class="animated bounceIn"
         leave-active-class="animated zoomOut"
         class="row"
-        :duration="{enter: 300, leave: 200}"
-        >
+      >
         <template v-for="game in list">
           <game
-            class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap"
+            :id="game.gameId"
             :key="game.gameId"
-            :id="game.gameId">
-            <div v-if="ranking" slot="controls">
-              <b-btn size="sm" variant="primary" @click="setrank(game.gameId)">
-                <icon name="angle-double-up" aria-hidden></icon>
+            class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap"
+          >
+            <div 
+              v-if="ranking" 
+              slot="controls">
+              <b-btn 
+                size="sm" 
+                variant="primary" 
+                @click="setrank(game.gameId)">
+                <icon 
+                  name="angle-double-up" 
+                  aria-hidden/>
                 <span class="sr-only">set rank</span>
               </b-btn>
-              <b-btn size="sm" variant="danger" @click="dropgame(game.gameId)">
-                <icon name="close" aria-hidden></icon>
+              <b-btn 
+                size="sm" 
+                variant="danger" 
+                @click="dropgame(game.gameId)">
+                <icon 
+                  name="close" 
+                  aria-hidden/>
                 <span class="sr-only">drop game</span>
               </b-btn>
-              <b-btn size="sm" variant="info" :to="'/game/'+game.gameId">
-                <icon name="info-circle" aria-hidden></icon>
-                <span class="sr-only">view details for {{game.name}}</span>
+              <b-btn 
+                :to="'/game/'+game.gameId"
+                size="sm" 
+                variant="info" 
+              >
+                <icon 
+                  name="info-circle" 
+                  aria-hidden/>
+                <span class="sr-only">view details for {{ game.name }}</span>
               </b-btn>
             </div>
           </game>
@@ -47,33 +67,43 @@
       </transition-group>
         
     </div>
-    <div v-show="list.length < 1"
+    <div 
+      v-show="list.length < 1"
       class="row my-1 widget container-fluid mx-auto">
       No games.
     </div>
-      <!-- bottom pager -->
+    <!-- bottom pager -->
     <page-controls
-      id="bottom-pager"
-      class="widget mb-1"
       v-show="pages > 1"
+      id="bottom-pager"
       :pages="pages"
       :page="page"
+      class="widget mb-1"
       @pageChange="setPage"
       @next="nextPage"
-      @prev="prevPage"></page-controls>
+      @prev="prevPage"/>
   </div>
 </template>
 
 <script>
-import Game from './game.vue';
-import PageControls from './page-controls.vue';
-import { mapGetters } from 'vuex';
-import Icon from 'vue-awesome';
+import Game from "./game.vue";
+import PageControls from "./page-controls.vue";
+import { mapGetters } from "vuex";
+import Icon from "vue-awesome";
 
 export default {
-  name: 'GamesBrowser',
+  name: "GamesBrowser",
 
   components: { Game, PageControls, Icon },
+
+  props: {
+    ids: {
+      type: Array,
+      default: function() {
+        return [];
+      }
+    }
+  },
 
   data() {
     return {
@@ -81,15 +111,13 @@ export default {
     };
   },
 
-  props: { ids: Array },
-
   computed: {
-    ...mapGetters(['games', 'rankableGames', 'getGame']),
+    ...mapGetters(["games", "rankableGames", "getGame"]),
     ...mapGetters({
-      perPage: 'getPerPage'
+      perPage: "getPerPage"
     }),
     ranking() {
-      return this.ids ? true : false;
+      return this.ids == [] ? false : true;
     },
     pages() {
       if (this.ids) {
@@ -99,7 +127,7 @@ export default {
     },
     list() {
       let games = [];
-      if (this.ids) {
+      if (this.ids.length) {
         games = this.ids.map(game => this.getGame(game));
       } else {
         games = this.games;
@@ -113,10 +141,10 @@ export default {
 
   methods: {
     setrank(id) {
-      this.$emit('setrank', id);
+      this.$emit("setrank", id);
     },
     dropgame(id) {
-      this.$emit('dropgame', id);
+      this.$emit("dropgame", id);
     },
     setPage(p) {
       this.page = p;

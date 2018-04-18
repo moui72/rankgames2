@@ -1,12 +1,12 @@
 <template>
   <div>
-    <list :id="id"></list>
+    <list :id="id"/>
   </div>
 </template>
 <script>
-import List from '../components/list.vue';
+import List from "../components/list.vue";
 export default {
-  name: 'ListPage',
+  name: "ListPage",
   components: { List },
   data: () => {
     return {};
@@ -19,4 +19,5 @@ export default {
 };
 </script>
 <style lang="scss">
+
 </style>

@@ -1,35 +1,57 @@
 <template>
   <div id="app">
-    <b-navbar toggleable="md" variant="primary" type="dark">
-      <b-navbar-toggle target="nav_dropdown_collapse"></b-navbar-toggle>
+    <b-navbar 
+      toggleable="md" 
+      variant="primary" 
+      type="dark">
+      <b-navbar-toggle target="nav_dropdown_collapse"/>
       <b-navbar-brand href="#">
-        {{title}}
+        {{ title }}
       </b-navbar-brand>
       <span class="warning float-right">
         Alpha
-        <small>{{version}}</small>
+        <small>{{ version }}</small>
       </span>
-       <b-collapse is-nav id="nav_dropdown_collapse">
-         <b-navbar-nav class="mr-auto">
-           <b-nav-item href="/">
-             <icon name="home" aria-hidden label="home icon" scale=".95"></icon>
-             <span>Home</span>
-           </b-nav-item>
-           <b-nav-item to="/lists">
-             <icon name="list" aria-hidden label="lists icon" scale=".95"></icon>
-             <span>Lists</span>
-           </b-nav-item>
-           <b-nav-item v-b-modal="'settings'" title="settings">
-             <icon name="cog" aria-hidden label="settings icon" scale=".95"></icon>
-             <span>Settings</span>
-           </b-nav-item>
-         </b-navbar-nav>
-         <b-navbar-nav v-if="!isHome()" class="float-right">
-           <b-nav-item @click="back">
-             &times; Back
-           </b-nav-item>
-         </b-navbar-nav>
-       </b-collapse>
+      <b-collapse 
+        id="nav_dropdown_collapse"
+        is-nav 
+      >
+        <b-navbar-nav class="mr-auto">
+          <b-nav-item to="/">
+            <icon 
+              name="home" 
+              aria-hidden 
+              label="home icon" 
+              scale=".95"/>
+            <span>Home</span>
+          </b-nav-item>
+          <b-nav-item to="/lists">
+            <icon 
+              name="list" 
+              aria-hidden 
+              label="lists icon" 
+              scale=".95"/>
+            <span>Lists</span>
+          </b-nav-item>
+          <b-nav-item 
+            v-b-modal="'settings'" 
+            title="settings">
+            <icon 
+              name="cog" 
+              aria-hidden 
+              label="settings icon" 
+              scale=".95"/>
+            <span>Settings</span>
+          </b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav 
+          v-if="!isHome()" 
+          class="float-right">
+          <b-nav-item @click="back">
+            &larr; Back
+          </b-nav-item>
+        </b-navbar-nav>
+      </b-collapse>
 
     </b-navbar>
 
@@ -43,52 +65,64 @@
         label="Games per page"
         description="How many games to show on each page.
           Lower values may provide better performance.">
-        <b-form-select @change="setPerPage" v-model="perPage">
-          <option v-for="n in 9" :value="n*12">
-            {{n * 12}} items
+        <b-form-select 
+          v-model="perPage"
+          @change="setPerPage" 
+        >
+          <option 
+            v-for="n in 9" 
+            :value="n*12" 
+            :key="n">
+            {{ n * 12 }} items
           </option>
         </b-form-select>
       </b-form-group>
     </b-modal>
 
-    <router-view class="container-fluid"></router-view>
-    <div class="container-fluid">
-      <rg-footer></rg-footer>
-    </div>
+    <transition
+      :duration="{in: 300, out:200}"
+      name="page-change"
+      appear
+      mode="out-in"
+      enter-active-class="animated slideInLeft"
+      leave-active-class="animated slideOutRight"
+    >
+      <router-view class="container-fluid"/>
+    </transition>
+
+    <div class="container-fluid"/>
   </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
-import RgFooter from './components/footer.vue';
-import Icon from 'vue-awesome';
+import { mapMutations } from "vuex";
+import RgFooter from "./components/footer.vue";
+import Icon from "vue-awesome";
 
 //@TODO ROUTES!!!!11 (library, list)
 export default {
-  name: 'app',
+  name: "App",
   components: {
     Icon,
     RgFooter
   },
   data() {
     return {
-      title: 'Rank Games',
-      version: '1.0.1',
+      title: "Rank Games",
+      version: "1.0.1",
       focus: false,
       perPage: 24
     };
   },
   methods: {
-    ...mapMutations(['setPerPage']),
+    ...mapMutations(["setPerPage"]),
 
     back() {
-      this.hasHistory();
+      window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     },
-    hasHistory() {
-      console.log(this.$router);
-    },
+
     isHome() {
-      return this.$route.name == 'Home';
+      return this.$route.name == "Home";
     }
   }
 };

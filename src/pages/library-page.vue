@@ -1,17 +1,20 @@
 <template>
-  <library></library>
+  <div>
+    <library/>
+    <rg-footer/>
+  </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
-import Library from '../components/library.vue';
-import Icon from 'vue-awesome';
+import Library from "../components/library.vue";
+import RgFooter from "../components/footer.vue";
 
 export default {
-  name: 'LibraryPage',
-  props: { id: Number },
+  name: "LibraryPage",
   components: {
+    RgFooter,
     Library
-  }
+  },
+  props: { id: { type: Number, required: true } }
 };
 </script>
 <style lang="scss"></style>

@@ -1,8 +1,8 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import axios from 'axios';
-import _ from 'lodash';
-import createPersistedState from 'vuex-persistedstate';
+import Vue from "vue";
+import Vuex from "vuex";
+import axios from "axios";
+import _ from "lodash";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
@@ -17,10 +17,10 @@ const state = {
       text: "games I don't own",
       simple: true
     },
-    isExpansion: { test: false, text: 'expansions', simple: true },
+    isExpansion: { test: false, text: "expansions", simple: true },
     numPlays: { test: 1, text: "games I haven't played", simple: true },
-    pcf: { test: null, text: 'players', simple: false },
-    ur: { test: null, text: 'user rating', simple: false }
+    pcf: { test: null, text: "players", simple: false },
+    ur: { test: null, text: "user rating", simple: false }
   },
   requests: [],
   games: [],
@@ -31,46 +31,46 @@ const state = {
     rankable: true
   },
   properties: {
-    visible: 'vbln',
-    rankable: 'rbln'
+    visible: "vbln",
+    rankable: "rbln"
   },
-  view: 'dfl',
+  view: "dfl",
   views: {
     dfl: {
-      text: 'Default',
-      details: 'Showing all rankable games that are marked visible.',
-      getter: 'rvGames'
+      text: "Default",
+      details: "Showing all rankable games that are marked visible.",
+      getter: "rvGames"
     },
     rbl: {
-      text: 'All rankable',
-      details: 'All games marked rankable, including invisible ones.',
-      getter: 'rankableGames'
+      text: "All rankable",
+      details: "All games marked rankable, including invisible ones.",
+      getter: "rankableGames"
     },
     vbl: {
-      text: 'Visible only',
+      text: "Visible only",
       details:
-        'Showing rankable and unrankable games that are marked as visible.',
-      getter: 'visibleGames'
+        "Showing rankable and unrankable games that are marked as visible.",
+      getter: "visibleGames"
     },
 
     vbln: {
-      text: 'Invisible only',
+      text: "Invisible only",
       details:
-        'Invisible games do not appear in the default view. They may or may ' +
-        'not be rankable.',
-      getter: 'visibleGames'
+        "Invisible games do not appear in the default view. They may or may " +
+        "not be rankable.",
+      getter: "visibleGames"
     },
     rbln: {
-      text: 'Unrankable only',
+      text: "Unrankable only",
       details:
-        'Unrankable games do not appear in the default view, and are not ' +
-        'considered as candidates for your list(s).',
-      getter: 'rankableGames'
+        "Unrankable games do not appear in the default view, and are not " +
+        "considered as candidates for your list(s).",
+      getter: "rankableGames"
     },
     all: {
-      text: 'Everything',
-      details: 'Showing all games.',
-      getter: ''
+      text: "Everything",
+      details: "Showing all games.",
+      getter: ""
     }
   }
 };
@@ -86,7 +86,7 @@ const getters = {
   },
   activePCF: state => {
     return state.activeFilters.some(f => {
-      return f.indexOf('pcf') >= 0;
+      return f.indexOf("pcf") >= 0;
     });
   },
   getPerPage: state => {
@@ -105,16 +105,16 @@ const getters = {
     return state.view;
   },
   games: (state, getters) => {
-    if (getters.currentView == 'all') return state.games;
+    if (getters.currentView == "all") return state.games;
     return getters[state.views[getters.currentView].getter];
   },
-  filteredGames: (state, getters) => {
+  filteredGames: state => {
     return state.games.filter(game => {
       let show = true;
       state.activeFilters.forEach(filter => {
-        if (filter.substr(0, 3) === 'pcf') {
+        if (filter.substr(0, 3) === "pcf") {
           // player count filter
-          let pcfArgs = filter.split('-');
+          let pcfArgs = filter.split("-");
           if (pcfArgs.length < 3) {
             // includes mode
             show =
@@ -126,7 +126,7 @@ const getters = {
         } else {
           if (
             game[filter] !== state.filters[filter].test &&
-            (typeof state.filters[filter].test != 'number' ||
+            (typeof state.filters[filter].test != "number" ||
               game[filter] < state.filters[filter].test)
           ) {
             show = false;
@@ -147,27 +147,27 @@ const getters = {
   },
   visibleGames: (state, getters) => {
     return getters.filteredGames.filter(game => {
-      return game.visible == !(state.view.charAt(3) == 'n');
+      return game.visible == !(state.view.charAt(3) == "n");
     });
   },
   rankableGames: (state, getters) => {
     return getters.filteredGames.filter(game => {
-      return game.rankable == !(state.view.charAt(3) == 'n');
+      return game.rankable == !(state.view.charAt(3) == "n");
     });
   },
   rvGames: (state, getters) => {
     return getters.rankableGames.filter(game => {
-      return game.visible == !(state.view.charAt(3) == 'n');
+      return game.visible == !(state.view.charAt(3) == "n");
     });
   },
   preImportGames: state => {
     return state.preImportGames;
   },
   newGames: state => {
-    return _.differenceBy(state.preImportGames, state.games, 'gameId');
+    return _.differenceBy(state.preImportGames, state.games, "gameId");
   },
   droppedGames: state => {
-    return _.differenceBy(state.games, state.preImportGames, 'gameId');
+    return _.differenceBy(state.games, state.preImportGames, "gameId");
   },
   toggles: state => {
     return Object.keys(state.toggleables);
@@ -186,9 +186,11 @@ const getters = {
 };
 
 const actions = {
-  renameList({ commit, state, dispatch }, { listid, newName }) {
-    commit('renameList', { id, newName });
-    dispatch('listUpdated', { listid });
+  renameList({ commit, getters, dispatch }, { listid, newName }) {
+    console.log(listid);
+
+    commit("renameList", { list: getters.getList(listid), newName });
+    dispatch("listUpdated", { listid });
   },
   /**
    * Sets the rank of game in list to given rank, clearing any prior ranking.
@@ -198,29 +200,29 @@ const actions = {
    * @param  {Number}   game   gameId of game
    * @param  {Number}   rank   rank to give game
    */
-  setrankto({ commit, dispatch, state, getters }, { listid, game, rank }) {
+  setrankto({ commit, dispatch, getters }, { listid, game, rank }) {
     let list = getters.getList(listid);
     let currentRank = list.list.indexOf(game);
-    if (currentRank >= 0) commit('unrank', { list, game, rank: currentRank });
+    if (currentRank >= 0) commit("unrank", { list, game, rank: currentRank });
     if (rank >= 0) {
-      commit('setRank', { list, rank, game });
+      commit("setRank", { list, rank, game });
     }
-    dispatch('listUpdated', { listid });
+    dispatch("listUpdated", { listid });
   },
   /**
-   * 
-   * @param {function} commit Vue context.commit 
-   * @param string username 
+   *
+   * @param {function} commit Vue context.commit
+   * @param string username
    * @return promise  Resolves array of game objects
    */
   getCollection({ commit }, username) {
     console.log(username);
     return new Promise((resolve, reject) => {
       if (!username.length) {
-        reject('No username provided.');
+        reject("No username provided.");
       }
-      let request = 'http://rankgames.ty-pe.com/bggapi/?username=' + username;
-      commit('logRequest', request);
+      let request = "http://rankgames.ty-pe.com/bggapi/?username=" + username;
+      commit("logRequest", request);
       axios
         .get(request)
         .then(response => {
@@ -231,8 +233,8 @@ const actions = {
           if (data.error) {
             return reject(data.error.message);
           }
-          data['user'] = username;
-          commit('preprocessCollection', data);
+          data["user"] = username;
+          commit("preprocessCollection", data);
           return resolve(response);
         })
         .catch(error => {
@@ -240,7 +242,7 @@ const actions = {
         });
     });
   },
-  makeNewList({ state, commit }, { name }) {
+  makeNewList({ state, getters, commit }, { name }) {
     state.lists.sort((a, b) => {
       return a.id - b.id;
     });
@@ -250,9 +252,8 @@ const actions = {
         nextId = i;
       }
     }
-    let ids = state.games.map(game => game.gameId);
-    console.log(ids);
-    commit('newList', {
+    let ids = getters.rankableGames.map(game => game.gameId);
+    commit("newList", {
       name: name,
       games: ids,
       created: Date.now(),
@@ -262,16 +263,16 @@ const actions = {
     });
   },
   /**
-   * 
-   * 
+   *
+   *
    * @param {Object} { commit, dispatch, state, getters } Vuex state methods
    * @param {Object} { listid, game }
    */
-  dropGameInList({ commit, dispatch, state, getters }, { listid, game }) {
+  dropGameInList({ commit, dispatch, getters }, { listid, game }) {
     let list = getters.getList(listid);
     let index = list.games.indexOf(game);
-    commit('dropGameFromList', { list, index, game });
-    dispatch('listUpdated', { listid });
+    commit("dropGameFromList", { list, index, game });
+    dispatch("listUpdated", { listid });
   },
   /**
    * Removes duplicates and updates date modified
@@ -280,18 +281,18 @@ const actions = {
    * @param  {Object}   getters Vuex store getters
    * @param  {Number}   listid  id of list that is being updated
    */
-  listUpdated({ commit, state, getters }, { listid }) {
-    console.log('listupdated: ', listid);
+  listUpdated({ commit, getters }, { listid }) {
+    console.log("listupdated: ", listid);
     let list = getters.getList(listid);
     // commit('dedupe', { list });
-    commit('modified', { list });
+    commit("modified", { list });
   }
 };
 
 const mutations = {
   /**
    * Removes duplicate games from ranked and unranked set in list
-   * 
+   *
    * @param {any} state
    * @param {any} { list }
    */
@@ -300,15 +301,15 @@ const mutations = {
     list.games = _.uniq(list.games);
   },
   /**
-   * dropGameFromList removes the indicate game (game) from the given rank 
+   * dropGameFromList removes the indicate game (game) from the given rank
    * (index) of the ranked set for the indicated list (id)
-   * 
-   * @param {any} state 
-   * @param {any} { list, index, game } 
+   *
+   * @param {any} state
+   * @param {any} { list, index, game }
    */
   dropGameFromList(state, { list, index, game }) {
     if (list.games[index] == game) list.games.splice(index, 1);
-    else throw Exception('Game is not at given index.');
+    else throw ReferenceError("Game is not at given index.");
   },
   modified(state, { list }) {
     list.modifed = Date.now();
@@ -327,17 +328,14 @@ const mutations = {
     if (list.list[rank] === game) {
       list.list.splice(rank, 1);
     } else {
-      throw Exception('Given game does not have given rank.');
+      throw ReferenceError("Given game does not have given rank.");
     }
   },
   logRequest(state, req) {
     state.requests.push(req);
   },
-  renameList(state, { id, newName }) {
-    console.log(payload);
-    state.lists.find(list => {
-      return list.id === id;
-    }).name = newName;
+  renameList(state, { list, newName }) {
+    list.name = newName;
   },
   purgeLists(state) {
     state.lists = [];
@@ -353,8 +351,8 @@ const mutations = {
   clearPCF(state) {
     // PCF = "player count filter"
     let index = state.activeFilters.findIndex(f => {
-      console.log(f.indexOf('pcf'));
-      return f.indexOf('pcf') >= 0;
+      console.log(f.indexOf("pcf"));
+      return f.indexOf("pcf") >= 0;
     });
     if (index >= 0) {
       state.activeFilters.splice(index, 1);
@@ -384,11 +382,11 @@ const mutations = {
    * @return {void}                 no return value
    */
   importMerge(state) {
-    let newSet = _.unionBy(state.games, state.preImportGames, 'gameId');
+    let newSet = _.unionBy(state.games, state.preImportGames, "gameId");
     let conflicts = _.intersectionBy(
       state.preImportGames,
       state.games,
-      'gameId'
+      "gameId"
     );
     conflicts.forEach(cgame => {
       newSet.find(ngame => {
@@ -416,15 +414,15 @@ const mutations = {
   preprocessCollection(state, collection) {
     console.log(collection.user);
     let user = collection.user;
-    collection = _.uniqBy(collection, 'gameId');
+    collection = _.uniqBy(collection, "gameId");
     let prepdCollection = _.map(collection, game => {
       let g = {
         ...state.toggleables,
         ...game,
         user: user
       };
-      g['ratings'] = {};
-      g['ratings'][g.user] = g.rating;
+      g["ratings"] = {};
+      g["ratings"][g.user] = g.rating;
       return g;
     });
     state.preImportGames = prepdCollection;
@@ -454,7 +452,7 @@ export default new Vuex.Store({
   mutations,
   plugins: [
     createPersistedState({
-      paths: ['perPage', 'activeFilters', 'requests', 'games', 'view', 'lists']
+      paths: ["perPage", "activeFilters", "requests", "games", "view", "lists"]
     })
   ]
 });
