@@ -8,4 +8,10 @@ Built with [VueJS](http://vuejs.org), [Animate.css](https://daneden.github.io/an
 
 I welcome any and all feedback. Please contact me via [geekmail (moui)](https://boardgamegeek.com/geekmail/compose?touser=moui) or create an issue on the [rankgames2 github repo](https://github.com/moui72/rankgames2/issues).
 
-> WARNING: This app stores your data locally (for now). If you ever "clear all data" in your browser, you will lose everything.
+> WARNING: This app stores your data locally (for now). If you ever "clear all data" or clear data for the app site in your browser, you will lose everything.
+
+## Fund me
+
+Like this app?
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/moui72)
