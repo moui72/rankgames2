@@ -6,6 +6,10 @@ Built with [VueJS](http://vuejs.org), [Animate.css](https://daneden.github.io/an
 
 ## Feedback
 
+<<<<<<< HEAD
 I welcome any and all feedback. Please contact me via [geekmail (moui)](https://boardgamegeek.com/geekmail/compose?touser=moui) or create an issue on the [rankgames2 github repo](https://github.com/moui72/rankgames2/issues).
+=======
+I welcome any and all feedback. Please use one of the following methods to contact me: geekmail moui, reply to my forum thread, or create an issue on the rankgames github repo.
+>>>>>>> 05a72cb3de24d4dd729cba9ab5a05b118f31efec
 
 > WARNING: This app stores your data locally (for now). If you ever "clear all data" in your browser, you will lose everything.
