@@ -15,3 +15,5 @@ I welcome any and all feedback. Please contact me via [geekmail (moui)](https://
 Like this app?
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/moui72)
+
+Donations will go towards developing new features and improving infrastructure for this app.
