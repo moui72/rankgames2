@@ -115,7 +115,6 @@
         class="widget"
       />
       <b-list-group 
-        v-if="data.list && data.list.length > 1"
         class="base mb-2" 
       >
 

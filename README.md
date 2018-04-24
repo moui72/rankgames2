@@ -1,18 +1,11 @@
-# vue-rg
+# Rank Games 2
 
-> A Vue.js project
+This app is intended to help you build ranked lists of games from those in your collection on [Board Game Geek](http://boardgamegeek.com). Total rewrite of my previous [RankGames app](https://boardgamegeek.com/thread/1442306/game-ranking-tool). Performance should be much improved, and I think the animations really help usability.
 
-## Build Setup
+Built with [VueJS](http://vuejs.org), [Animate.css](https://daneden.github.io/animate.css/) and [BootstrapVue](https://bootstrap-vue.js.org/).
 
-``` bash
-# install dependencies
-npm install
+## Feedback
 
-# serve with hot reload at localhost:8080
-npm run dev
+I welcome any and all feedback. Please use one of the following methods to contact me: geekmail moui, reply to my forum thread, or create an issue on the rankgames github repo.
 
-# build for production with minification
-npm run build
-```
-
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+> WARNING: This app stores your data locally (for now). If you ever "clear all data" in your browser, you will lose everything.
