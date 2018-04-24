@@ -63,7 +63,7 @@
       enter-active-class="animated slideInLeft" 
       leave-active-class="animated slideOutLeft">
       <div 
-        v-if="rankedCached && unrankedCached" 
+        v-if="bufferReady" 
         key="comparing">
         <!-- comparisons -->
         <compare 
@@ -82,7 +82,10 @@
     </transition>
 
 
-    <div class="widget mt-3">
+    <div 
+      v-if="cached < data.games.length"
+      class="widget mt-3" 
+    >
       <h4>Preloading images ({{ cached }} of {{ ranked.length + unranked.length }})</h4>
       <h5>Buffer</h5>
       <b-progress 
@@ -95,7 +98,7 @@
         </b-progress-bar>
       </b-progress>
       <h5>Total</h5>
-      <b-progress :max="ranked.length + unranked.length">
+      <b-progress :max="data.games.length">
         <b-progress-bar :value="cached">
           {{ cached }} / {{ ranked.length + unranked.length }}
         </b-progress-bar>
@@ -107,12 +110,12 @@
       <!-- ranked -->
       <h3 class="base mt-3 p-3">Ranked games</h3>
       <b-pagination 
+        v-if="ranked.length > rankedPerPage"
         :total-rows="ranked.length" 
         :per-page="rankedPerPage" 
         v-model="rankedPage" 
         align="center" 
         size="md" 
-        class="widget"
       />
       <b-list-group 
         class="base mb-2" 
@@ -177,6 +180,8 @@
         </b-list-group-item>
       </b-list-group>
       <b-pagination 
+        v-if="ranked.length > rankedPerPage"
+      
         :total-rows="ranked.length" 
         :per-page="rankedPerPage"
         v-model="rankedPage" 
@@ -195,248 +200,258 @@
 </template>
 
 <script>
-  import {
-    mapGetters,
-    mapActions
-  } from "vuex";
-  import Game from "../components/game.vue";
-  import GamesBrowser from "./games-browser.vue";
-  import Compare from "./compare.vue";
-  import Icon from "vue-awesome";
-  import * as _ from "lodash";
+import { mapGetters, mapActions } from "vuex";
+import Game from "../components/game.vue";
+import GamesBrowser from "./games-browser.vue";
+import Compare from "./compare.vue";
+import Icon from "vue-awesome";
+import * as _ from "lodash";
 
-  function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  export default {
-    name: "List",
-    components: {
-      Icon,
-      Game,
-      GamesBrowser,
-      Compare
+export default {
+  name: "List",
+  components: {
+    Icon,
+    Game,
+    GamesBrowser,
+    Compare
+  },
+  props: {
+    id: { type: Number, required: true }
+  },
+  data() {
+    return {
+      editingName: false,
+      newName: "",
+      msg: "",
+      challengerID: 0,
+      incumbantIndex: 0,
+      rankedPage: 1,
+      rankedPerPage: 10,
+      rankedCached: false,
+      cacheCycles: 0,
+      imageCache: {}
+    };
+  },
+  computed: {
+    ...mapGetters(["getList", "getGame"]),
+    bufferReady() {
+      return (
+        this.rankedCached &&
+        this.cached - this.ranked.length > this.unranked.length / 2
+      );
     },
-    props: {
-      id: {type: Number, required: true}
+    unranked() {
+      return _.difference(this.data.games, this.ranked);
+    },
+    pagedRanked() {
+      return this.ranked.slice(
+        (this.rankedPage - 1) * this.rankedPerPage,
+        this.rankedPage * this.rankedPerPage
+      );
+    },
+    ranked() {
+      return this.data.list;
     },
     data() {
-      return {
-        editingName: false,
-        newName: "",
-        msg: "",
-        challengerID: 0,
-        incumbantIndex: 0,
-        rankedPage: 1,
-        rankedPerPage: 10,
-        rankedCached: false,
-        cacheCycles: 0,
-        imageCache: {}
-      };
+      return this.getList(this.id);
     },
-    computed: {
-      ...mapGetters(["getList", "getGame"]),
-      unrankedCached() {
-        return this.cached > this.unranked.length;
-      },
-      unranked() {
-        return _.difference(this.data.games, this.ranked);
-      },
-      pagedRanked() {
-        return this.ranked.slice(
-          (this.rankedPage - 1) * this.rankedPerPage,
-          this.rankedPage * this.rankedPerPage
-        );
-      },
-      ranked() {
-        return this.data.list;
-      },
-      data() {
-        return this.getList(this.id);
-      },
-      incumbant() {
-        return this.data.list[this.incumbantIndex];
-      },
-      challenger() {
-        return this.challengerID;
-      },
-      cached() {
-        return Object.keys(this.imageCache).length;
-      }
-
+    incumbant() {
+      return this.data.list[this.incumbantIndex];
     },
-    mounted() {
-      this.caching();
-      this.cacheRanked();
-      this.newPair();
+    challenger() {
+      return this.challengerID;
     },
-    methods: {
-      ...mapActions(["setrankto", "renameList", "dropGameInList"]),
-      caching() {
-        const vm = this;
-        this.cacheImgs().then(() => {
+    cached() {
+      return Object.keys(this.imageCache).length;
+    }
+  },
+  mounted() {
+    this.caching();
+    this.cacheRanked();
+    this.newPair();
+  },
+  methods: {
+    ...mapActions(["setrankto", "renameList", "dropGameInList"]),
+    caching() {
+      const vm = this;
+      this.cacheImgs()
+        .then(() => {
           if (vm.cached < vm.ranked.length + vm.unranked.length) {
             vm.caching();
           }
         })
         .catch(e => {
-          console.error(e)
+          console.error(e);
         });
-      },
-      rankOf(gameId) {
-        return (
-          this.ranked.findIndex(el => {
-            return el == gameId;
-          }) + 1
+    },
+    rankOf(gameId) {
+      return (
+        this.ranked.findIndex(el => {
+          return el == gameId;
+        }) + 1
+      );
+    },
+    getChallenger() {
+      if (this.unranked.length > 0) {
+        this.challengerID = this.unranked[0];
+      } else {
+        this.challengerID = false;
+      }
+      return false;
+    },
+    getIncumbant() {
+      this.incumbantIndex = 0;
+      if (this.data.list.length < 1) {
+        this.setrank(this.unranked[0], 1);
+      } else if (this.data.list.length > 3) {
+        this.incumbantIndex = Math.floor(
+          this.ranked.length / 2 + randomInt(-1, 1)
         );
-      },
-      getChallenger() {
-        if (this.unranked.length > 0) {
-          this.challengerID = this.unranked[0];
-        } else {
-          this.challengerID = false;
-        }
-        return false;
-      },
-      getIncumbant() {
-        this.incumbantIndex = 0;
-        if (this.data.list.length < 1) {
-          this.setrank(this.unranked[0], 1);
-        } else if (this.data.list.length > 3) {
-          this.incumbantIndex = Math.floor(
-            this.ranked.length / 2 + randomInt(-1, 1)
+      }
+      this.cacheImg(this.incumbant);
+      return this.incumbantIndex;
+    },
+    nextIncumbant() {
+      if (this.incumbantIndex < 1) {
+        this.setrank(this.challenger, 0);
+        this.newPair();
+      } else {
+        this.incumbantIndex -= 1;
+      }
+    },
+    newPair() {
+      this.getIncumbant();
+      this.getChallenger();
+      try {
+        this.cacheImg(this.challenger)
+          .then(i => this.imgReady(this.challenger, i))
+          .catch(e => this.cacheImgFail(this.challenger, e));
+        this.cacheImg(this.incumbant)
+          .then(i => this.imgReady(this.incumbant, i))
+          .catch(e => this.cacheImgFail(this.incumbant, e));
+      } catch (e) {
+        console.error("Invalid incumbant or challenger. Retrying.");
+        this.newPair();
+      }
+    },
+    pick(id) {
+      if (id === this.incumbant) {
+        this.setrank(this.challenger, this.incumbantIndex + 1);
+        this.newPair();
+      } else {
+        this.nextIncumbant();
+      }
+    },
+    setrank(id, rank) {
+      rank = rank || 0;
+      this.setrankto({
+        listid: this.id,
+        game: id,
+        rank: rank
+      });
+    },
+    drop(id) {
+      console.log("drop", id);
+      this.dropGameInList({
+        listid: this.id,
+        game: id
+      });
+    },
+    gameData(id) {
+      return this.getGame(id);
+    },
+    rename() {
+      if (this.newName.trim() == "")
+        return this.cancelRename("list must have a name");
+      this.renameList({
+        listid: this.id,
+        newName: this.newName
+      });
+      this.editingName = false;
+    },
+    editName() {
+      this.editingName = true;
+      this.$nextTick(() => this.$refs.namefield.$el.focus());
+    },
+    cancelRename(msg) {
+      if (msg) {
+        this.msg = msg;
+      }
+      this.editingName = false;
+    },
+    imgIsReady(id) {
+      if (
+        !typeof this.imageCache[id] == "undefined" &&
+        this.imageCache[id].ready
+      ) {
+        return true;
+      }
+      return false;
+    },
+    cacheImg(id) {
+      this.$set(this.imageCache, id, {
+        img: null,
+        ready: false
+      });
+      return new Promise((resolve, reject) => {
+        if (
+          id === 0 ||
+          typeof id == "undefined" ||
+          typeof this.gameData(id) == "undefined"
+        )
+          reject(
+            new RangeError("cacheImg got invalid game id (" + id + ")", 400)
           );
-        }
-        this.cacheImg(this.incumbant);
-        return this.incumbantIndex;
-      },
-      nextIncumbant() {
-        if (this.incumbantIndex < 1) {
-          this.setrank(this.challenger, 0);
-          this.newPair();
-        } else {
-          this.incumbantIndex -= 1;
-        }
-      },
-      newPair() {
-        this.getIncumbant();
-        this.getChallenger();
-        try {
-          this.cacheImg(this.challenger)
-            .then(i => this.imgReady(this.challenger, i))
-            .catch(e => this.cacheImgFail(this.challenger, e));
-          this.cacheImg(this.incumbant)
-            .then(i => this.imgReady(this.incumbant, i))
-            .catch(e => this.cacheImgFail(this.incumbant, e));
-        } catch (e) {
-          console.error("Invalid incumbant or challenger. Retrying.");
-          this.newPair()
-        }
-      },
-      pick(id) {
-        if (id === this.incumbant) {
-          this.setrank(this.challenger, this.incumbantIndex + 1);
-          this.newPair();
-        } else {
-          this.nextIncumbant();
-        }
-      },
-      setrank(id, rank) {
-        rank = rank || 0;
-        this.setrankto({
-          listid: this.id,
-          game: id,
-          rank: rank
-        });
-      },
-      drop(id) {
-        console.log('drop',id)
-        this.dropGameInList({
-          listid: this.id,
-          game: id
-        });
-      },
-      gameData(id) {
-        return this.getGame(id);
-      },
-      rename() {
-        if (this.newName.trim() == "")
-          return this.cancelRename("list must have a name");
-        this.renameList({
-          listid: this.id,
-          newName: this.newName
-        });
-        this.editingName = false;
-      },
-      editName() {
-        this.editingName = true;
-        this.$nextTick(() => this.$refs.namefield.$el.focus());
-      },
-      cancelRename(msg) {
-        if (msg) {
-          this.msg = msg;
-        }
-        this.editingName = false;
-      },
-      imgIsReady(id) {
-        if (!typeof this.imageCache[id] == "undefined" &&
-          this.imageCache[id].ready
-        ) {
-          return true;
-        }
-        return false;
-      },
-      cacheImg(id) {
-        if (id === 0)
-          throw new RangeError("cacheImg got invalid game id (" + id + ")", 282);
-        this.$set(this.imageCache, id, {
-          ready: false
-        });
-        return new Promise((resolve, reject) => {
-          if (typeof this.gameData(id) == "undefined") {
-            reject(id);
-          }
-          if (!this.imageCache[id] || !this.imageCache[id].ready) {
-            try {
-              let img = new Image();
-              img.onload = () => {
-                resolve(img);
-              };
-              img.src = this.gameData(id).image;
-            } catch (e) {
-              reject(e);
-            }
-          } else {
-            console.error("ready already", id);
-          }
-        });
-      },
-      cacheImgs(n = 5) {
-        return new Promise((resolve, reject) => {
-          let preloaded = 0;
-          let errors = 0;
-          const doneFn = () => {
-            const resp = 'cached ' + preloaded + ' with ' + errors 
-              + ' errors.';
-            if (preloaded > errors) {
-              resolve(resp);
-            } else {
-              reject(resp);
-            }
-          }
-          this.cacheCycles++;
-          if (this.unranked.length - n < n * (this.cacheCycles + 1)) {
-            n = this.unranked.length - n * (this.cacheCycles + 1);
-          }
-          if (!n) {
-            resolve('Nothing left to cache.')
-          }
-          for (let i = 0; i < n; i++) {
 
-            this.cacheImg(this.unranked[i + (5 * this.cacheCycles)])
+        if (!this.imageCache[id] || !this.imageCache[id].ready) {
+          try {
+            let img = new Image();
+            img.onload = () => {
+              resolve(img);
+            };
+            img.src = this.gameData(id).image;
+          } catch (e) {
+            console.log("loading img failed", id);
+            reject(new Error("could not load img for (" + id + ")."));
+          }
+        } else {
+          console.error("ready already", id);
+        }
+      });
+    },
+    cacheImgs(n = 5) {
+      return new Promise((resolve, reject) => {
+        let preloaded = 0;
+        let errors = 0;
+        const doneFn = () => {
+          const resp = "cached " + preloaded + " with " + errors + " errors.";
+          this.cacheCycles++;
+          if (preloaded > errors) {
+            resolve(resp);
+          } else {
+            reject(resp);
+          }
+        };
+        if (this.cached > this.data.games.length - n) {
+          console.log("less than 5 to cache", n, this.data.games.length);
+          n = this.data.games.length - this.cached;
+          console.log(n);
+        }
+        if (n < 1) {
+          console.log("nothing left to cache");
+          resolve("Nothing left to cache.");
+        }
+        for (let i = 0; i < n; i++) {
+          const gameId = this.data.games[i + 5 * this.cacheCycles];
+          try {
+            this.cacheImg(gameId)
               .then(imgObj => {
                 preloaded++;
-                this.imgReady(this.unranked[i], imgObj);
+                this.imgReady(gameId, imgObj);
                 if (preloaded + errors == n) {
                   doneFn();
                 }
@@ -444,57 +459,75 @@
               .catch(err => {
                 errors++;
                 console.error("error:", err);
-                this.cacheImgFail(this.unranked[i], err);
+                this.cacheImgFail(gameId, err);
                 if (preloaded + errors == n) {
                   doneFn();
                 }
               });
+          } catch (e) {
+            console.error(e, 455);
           }
-        });
-      },
-      cacheRanked() {
-        let cached = 0;
-        for (let i = 0; i < this.ranked.length; i++) {
-          let ico = this.imageCache[this.ranked[i]]; // image cache object
-          if (typeof ico == "undefined" || !ico.ready) {
-            this.cacheImg(this.ranked[i]).then(() => {
+        }
+      });
+    },
+    cacheRanked() {
+      let cached = 0;
+      for (let i = 0; i < this.ranked.length; i++) {
+        let ico = this.imageCache[this.ranked[i]]; // image cache object
+        if (typeof ico == "undefined" || !ico.ready) {
+          this.cacheImg(this.ranked[i])
+            .then(() => {
               cached++;
               if (cached == this.ranked.length) {
                 this.rankedCached = true;
               }
-            });
-          } else {
-            cached++;
-            if (cached == this.ranked.length) {
-              this.rankedCached = true;
-            }
+            })
+            .catch(e => this.cacheImgFail(e));
+        } else {
+          cached++;
+          if (cached == this.ranked.length) {
+            this.rankedCached = true;
           }
         }
-      },
-      cacheImgFail(id, imgObj) {
-        console.error("failed to cache", id, imgObj);
-        this.$set(this.imageCache, id, {
-          img: imgObj,
-          ready: false
-        });
-      },
-      imgReady(id, imgObj) {
-        this.$set(this.imageCache, id, {
-          img: imgObj,
-          ready: true
-        });
       }
+    },
+    cacheImgFail(id, imgObj) {
+      console.error("failed to cache", id, imgObj);
+      this.$set(this.imageCache, id, {
+        img: imgObj,
+        ready: false
+      });
+    },
+    imgReady(id, imgObj) {
+      this.$set(this.imageCache, id, {
+        img: imgObj,
+        ready: true
+      });
     }
-  };
+  }
+};
 </script>
 <style lang="scss">
-  .move {
-    transition: transform 1s;
+.move {
+  transition: transform 1s;
+}
+.shadow {
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
+}
+.page-item {
+  @extend .shadow;
+  &:first-child {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
   }
-
-  .rank {
-    text-align: right;
-    font-size: 3em;
-    margin-right: 0.5em;
+  &:last-child {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
   }
+}
+.rank {
+  text-align: right;
+  font-size: 3em;
+  margin-right: 0.5em;
+}
 </style>

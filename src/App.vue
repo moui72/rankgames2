@@ -133,8 +133,11 @@ body,
 html {
   background-color: #ccc;
 }
-.base {
+.shadow {
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
+}
+.base {
+  @extend .shadow;
   background-color: white;
   border-radius: 0.2rem;
 }
