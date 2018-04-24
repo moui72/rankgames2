@@ -148,22 +148,47 @@
                     <b-btn 
                       variant="success" 
                       @click="setrank(game, 0)">
-                      &#8676;
+                      &#10514;
                       <span class="sr-only">
                         Set this game's rank to #1
+                      </span>
+                    </b-btn>            
+                    <b-btn 
+                      variant="success" 
+                      class="weaker"
+                      @click="setrank(game, rankOf(game) - 2)"
+                    >
+                      &uarr;
+                      <span class="sr-only">
+                        Set this game's rank to #{{ rankOf(game) - 1 }}
                       </span>
                     </b-btn>
                     <b-btn 
                       variant="warning" 
-                      @click="setrank(game, ranked.length)">
-                      &#8677;
+                      class="weaker"
+                      @click="setrank(game, rankOf(game))"
+                    >
+                      &darr;
+                      <span class="sr-only">
+                        Set this game's rank to #{{ rankOf(game) + 1 }}
+                      </span>
+                    </b-btn>
+                    <b-btn 
+                      variant="warning" 
+                      @click="setrank(game, ranked.length)"
+                    >
+                      &#10515;
                       <span class="sr-only">
                         Set this game's rank to #{{ ranked.length }}
                       </span>
                     </b-btn>
+                  </b-button-group>
+                  <b-button-group class="ml-2">
                     <b-btn 
                       variant="danger" 
-                      @click="setrank(game, -1)">&times;
+                      @click="setrank(game, -1)"
+                    >
+                      &times;
                       <span class="sr-only">
                         Remove this game from the ranked list
                       </span>
@@ -181,7 +206,6 @@
       </b-list-group>
       <b-pagination 
         v-if="ranked.length > rankedPerPage"
-      
         :total-rows="ranked.length" 
         :per-page="rankedPerPage"
         v-model="rankedPage" 
@@ -195,7 +219,7 @@
       :ids="unranked" 
       class="mb-3" 
       @setrank="setrank" 
-      @drop="drop"/>
+      @dropgame="drop"/>
   </div>
 </template>
 
@@ -525,9 +549,16 @@ export default {
     border-bottom-right-radius: 0.25rem;
   }
 }
+.weaker {
+  color: black;
+  opacity: 0.7;
+}
 .rank {
   text-align: right;
   font-size: 3em;
   margin-right: 0.5em;
+}
+.ranked-game-item .btn {
+  color: black;
 }
 </style>
