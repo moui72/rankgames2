@@ -80,12 +80,12 @@
     </b-modal>
 
     <transition
-      :duration="{in: 300, out:200}"
+      :duration="{in: 300, out:150}"
       name="page-change"
       appear
       mode="out-in"
-      enter-active-class="animated slideInLeft"
-      leave-active-class="animated slideOutRight"
+      enter-active-class="animated slideInUp"
+      leave-active-class="animated slideOutDown"
     >
       <router-view class="container-fluid"/>
     </transition>
@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import RgFooter from "./components/footer.vue";
 import Icon from "vue-awesome";
 
@@ -115,6 +115,7 @@ export default {
     };
   },
   methods: {
+    // @TODO make action to use here instead of using mutation directly
     ...mapMutations(["setPerPage"]),
 
     back() {
@@ -164,5 +165,8 @@ html {
   small {
     font-variant: normal;
   }
+}
+.move {
+  transition: transform 1s;
 }
 </style>

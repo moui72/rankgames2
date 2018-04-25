@@ -19,6 +19,7 @@
         tag="div"
         name="game-list"
         appear
+        move-class="move" 
         mode="out-in"
         enter-active-class="animated bounceIn"
         leave-active-class="animated zoomOut"

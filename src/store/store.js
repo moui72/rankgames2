@@ -255,7 +255,10 @@ const actions = {
     let ids = getters.rankableGames.map(game => game.gameId);
     commit("newList", {
       name: name,
-      games: ids,
+      games: ids
+        .map(a => [Math.random(), a])
+        .sort((a, b) => a[0] - b[0])
+        .map(a => a[1]),
       created: Date.now(),
       modified: Date.now(),
       id: nextId,
