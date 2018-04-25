@@ -107,169 +107,10 @@
     </div>
 
 
-    <div>
-      <!-- ranked -->
-      <h3 class="base mt-3 p-3">Ranked games</h3>
-      <b-pagination 
-        v-if="ranked.length > rankedPerPage"
-        :total-rows="ranked.length" 
-        :per-page="rankedPerPage" 
-        v-model="rankedPage" 
-        align="center" 
-        size="md" 
-      />
-
-      <b-list-group 
-        class="base mb-2" 
-      >
-        <transition-group 
-          :duration="{out: 200, in: 400}"
-          name="next-game" 
-          move-class="move" 
-          enter-active-class="animated fadeIn" 
-          leave-active-class="animated fadeOut"
-        >
-          <template v-for="game in pagedRanked">
-            <b-list-group-item 
-              :key="game" 
-              class="ranked-game-item"
-            >
-              <div class="row align-items-center">
-                <div class="rank col-2 text-right text-primary">
-                  {{ rankOf(game) }}
-                </div>
-                <div class="col-5">
-                  <h4>
-                    {{ gameData(game).name }}
-                  </h4>
-                </div>
-                <div 
-                  v-show="!rerank(game)"
-                  class="col-5 text-left"
-                
-                >
-                  <b-button-toolbar 
-                    size="sm"                  
-                  >
-
-                    <b-button-group 
-                    >
-                      <b-btn 
-                        variant="success" 
-                        @click="setrank(game, 0)">
-                        &#10514;
-                        <span class="sr-only">
-                          Set this game's rank to #1
-                        </span>
-                      </b-btn>            
-                      <b-btn 
-                        variant="success" 
-                        class="weaker"
-                        @click="setrank(game, rankOf(game) - 2)"
-                      >
-                        &uarr;
-                        <span class="sr-only">
-                          Set this game's rank to #{{ rankOf(game) - 1 }}
-                        </span>
-                      </b-btn>
-                      <b-btn 
-                        variant="primary"
-                        @click="reranking(game)"
-                      >
-                        <span>#</span>
-                        <span class="sr-only">
-                          Set this game's rank to a given rank
-                        </span>
-                      </b-btn>
-
-                      <b-btn 
-                        variant="warning" 
-                        class="weaker"
-                        @click="setrank(game, rankOf(game))"
-                      >
-                        &darr;
-                        <span class="sr-only">
-                          Set this game's rank to #{{ rankOf(game) + 1 }}
-                        </span>
-                      </b-btn>
-                      <b-btn 
-                        variant="warning" 
-                        @click="setrank(game, ranked.length)"
-                      >
-                        &#10515;
-                        <span class="sr-only">
-                          Set this game's rank to #{{ ranked.length }}
-                        </span>
-                      </b-btn>
-                    
-                    </b-button-group>
-          
-                    <b-button-group 
-                      class="ml-2" 
-                    >
-                      <b-btn 
-                        variant="danger" 
-                        @click="setrank(game, -1)"
-                      >
-                        &times;
-                        <span class="sr-only">
-                          Remove this game from the ranked list
-                        </span>
-                      </b-btn>
-                    </b-button-group>
-                  </b-button-toolbar>
-                  
-                </div>
-                <div
-                  v-show="rerank(game)"
-                  :ref="'rr-' + game"
-                  class="col-5 text-right"
-                  
-                >
-
-                  <b-input-group size="sm">
-                    <b-form-input
-                      v-model="setRankTo"
-                      :placeholder="rankOf(game).toString()"
-                      :max="ranked.length" 
-                      :min="1" 
-                      type="number" 
-                    />
-                    <b-input-group-append>
-                      <b-btn 
-                        variant="success" 
-                        @click="reranked()"
-                      >
-                        &#10003;
-                      </b-btn>
-                      <b-btn 
-                        variant="warning" 
-                        @click="clearRerank()"
-                      >
-                        &times;
-                      </b-btn>
-                    </b-input-group-append>
-                  </b-input-group>
-                </div>
-                  
-              </div>
-            </b-list-group-item>
-          </template>
-        </transition-group>
-
-        <b-list-group-item v-if="!data.list || data.list.length < 1">
-          No ranked games yet.
-        </b-list-group-item>
-      </b-list-group>
-      <b-pagination 
-        v-if="ranked.length > rankedPerPage"
-        :total-rows="ranked.length" 
-        :per-page="rankedPerPage"
-        v-model="rankedPage" 
-        align="center" 
-        size="md" 
-      />
-    </div>
+    <ranked-games 
+      :list="data.list" 
+      @setrank="setrank"
+    />
     <!-- games browser -->
     <h3 class="base mt-3 p-3">Unranked games</h3>
     <games-browser 
@@ -285,6 +126,7 @@ import { mapGetters, mapActions } from "vuex";
 import Game from "../components/game.vue";
 import GamesBrowser from "./games-browser.vue";
 import Compare from "./compare.vue";
+import RankedGames from "./ranked-games.vue";
 import Icon from "vue-awesome";
 import Spinner from "vue-simple-spinner";
 import * as _ from "lodash";
@@ -296,6 +138,7 @@ function randomInt(min, max) {
 export default {
   name: "List",
   components: {
+    RankedGames,
     Icon,
     Game,
     GamesBrowser,
@@ -366,28 +209,6 @@ export default {
   },
   methods: {
     ...mapActions(["setrankto", "renameList", "dropGameInList"]),
-    rerank(id) {
-      return id == this.settingRank;
-    },
-    reranking(id) {
-      this.settingRank = id == this.settingRank ? 0 : id;
-      this.$nextTick(function() {
-        this.$refs["rr-" + id][0].children[0].children[0].focus();
-      });
-    },
-    reranked() {
-      let rank =
-        this.setRankTo < 0
-          ? 0
-          : this.setRankTo > this.ranked.length
-            ? this.ranked.length - 1
-            : this.setRankTo - 1;
-      this.setrank(this.settingRank, rank);
-      this.clearRerank();
-    },
-    clearRerank() {
-      this.settingRank = 0;
-    },
     caching() {
       const vm = this;
       try {
@@ -410,13 +231,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    rankOf(gameId) {
-      return (
-        this.ranked.findIndex(game => {
-          return game == gameId;
-        }) + 1
-      );
     },
     getChallenger() {
       if (this.unranked.length > 0) {
@@ -478,7 +292,6 @@ export default {
       });
     },
     drop(id) {
-      console.log("drop", id);
       this.dropGameInList({
         listid: this.id,
         game: id
