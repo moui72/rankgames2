@@ -1,7 +1,9 @@
 <template>
   <div class="base">
     <div class="row no-gutters compares">
-      <div @click="pickIncumbant()" class="col-6">
+      <div 
+        class="col-6" 
+        @click="pickIncumbant()">
         <transition
           name="next-game"
           mode="out-in"
@@ -11,21 +13,24 @@
           <game-compare
             :key="incumbantGame"
             :id="incumbantGame"
-            left>
-          </game-compare>
+            :use-image="images"
+            left/>
         </transition>
       </div>
-      <div @click="pickChallenger()" class="col-6">
+      <div 
+        class="col-6" 
+        @click="pickChallenger()">
         <transition
           name="next-game"
           mode="out-in"
           enter-active-class="animated zoomIn"
           leave-active-class="animated zoomOut">
           <game-compare
-            mode="out-in"
             :key="challengerGame"
-            :id="challengerGame">
-          </game-compare>
+            :id="challengerGame"
+            :use-image="images"
+            :left="false"
+            mode="out-in"/>
         </transition>
 
       </div>
@@ -33,14 +38,16 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
-import GameCompare from './game-compare.vue';
-import Icon from 'vue-awesome';
+import GameCompare from "./game-compare.vue";
 
 export default {
-  name: 'Compare',
+  name: "Compare",
   components: { GameCompare },
-  props: { incumbantGame: Number, challengerGame: Number },
+  props: {
+    incumbantGame: { type: Number, required: true },
+    challengerGame: { type: Number, required: true },
+    images: { type: Boolean, default: true }
+  },
   methods: {
     pickIncumbant() {
       this.pick(this.incumbantGame);
@@ -49,7 +56,7 @@ export default {
       this.pick(this.challengerGame);
     },
     pick(id) {
-      this.$emit('pick', id);
+      this.$emit("pick", id);
     }
   }
 };

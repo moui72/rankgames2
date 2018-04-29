@@ -7,6 +7,7 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 const state = {
+  useImgComparisons: true,
   perPage: 24,
   activeFilters: [],
   lists: [],
@@ -17,10 +18,26 @@ const state = {
       text: "games I don't own",
       simple: true
     },
-    isExpansion: { test: false, text: "expansions", simple: true },
-    numPlays: { test: 1, text: "games I haven't played", simple: true },
-    pcf: { test: null, text: "players", simple: false },
-    ur: { test: null, text: "user rating", simple: false }
+    isExpansion: {
+      test: false,
+      text: "expansions",
+      simple: true
+    },
+    numPlays: {
+      test: 1,
+      text: "games I haven't played",
+      simple: true
+    },
+    pcf: {
+      test: null,
+      text: "players",
+      simple: false
+    },
+    ur: {
+      test: null,
+      text: "user rating",
+      simple: false
+    }
   },
   requests: [],
   games: [],
@@ -48,22 +65,19 @@ const state = {
     },
     vbl: {
       text: "Visible only",
-      details:
-        "Showing rankable and unrankable games that are marked as visible.",
+      details: "Showing rankable and unrankable games that are marked as visible.",
       getter: "visibleGames"
     },
 
     vbln: {
       text: "Invisible only",
-      details:
-        "Invisible games do not appear in the default view. They may or may " +
+      details: "Invisible games do not appear in the default view. They may or may " +
         "not be rankable.",
       getter: "visibleGames"
     },
     rbln: {
       text: "Unrankable only",
-      details:
-        "Unrankable games do not appear in the default view, and are not " +
+      details: "Unrankable games do not appear in the default view, and are not " +
         "considered as candidates for your list(s).",
       getter: "rankableGames"
     },
@@ -88,6 +102,9 @@ const getters = {
     return state.activeFilters.some(f => {
       return f.indexOf("pcf") >= 0;
     });
+  },
+  getUseImgComparisons: state => {
+    return state.useImgComparisons;
   },
   getPerPage: state => {
     return state.perPage;
@@ -150,6 +167,7 @@ const getters = {
       return game.visible == !(state.view.charAt(3) == "n");
     });
   },
+
   rankableGames: (state, getters) => {
     return getters.filteredGames.filter(game => {
       return game.rankable == !(state.view.charAt(3) == "n");
@@ -186,11 +204,34 @@ const getters = {
 };
 
 const actions = {
-  renameList({ commit, getters, dispatch }, { listid, newName }) {
+  setUseImgComparisons({
+    commit
+  }, value) {
+    console.log('use image comparisons?', value)
+    commit("setUseImgComparisonsMutation", value)
+  },
+  setPerPage({
+    commit
+  }, value) {
+    commit("setPerPageMutation", value)
+  },
+  renameList({
+    commit,
+    getters,
+    dispatch
+  }, {
+    listid,
+    newName
+  }) {
     console.log(listid);
 
-    commit("renameList", { list: getters.getList(listid), newName });
-    dispatch("listUpdated", { listid });
+    commit("renameList", {
+      list: getters.getList(listid),
+      newName
+    });
+    dispatch("listUpdated", {
+      listid
+    });
   },
   /**
    * Sets the rank of game in list to given rank, clearing any prior ranking.
@@ -200,14 +241,32 @@ const actions = {
    * @param  {Number}   game   gameId of game
    * @param  {Number}   rank   rank to give game
    */
-  setrankto({ commit, dispatch, getters }, { listid, game, rank }) {
+  setrankto({
+    commit,
+    dispatch,
+    getters
+  }, {
+    listid,
+    game,
+    rank
+  }) {
     let list = getters.getList(listid);
     let currentRank = list.list.indexOf(game);
-    if (currentRank >= 0) commit("unrank", { list, game, rank: currentRank });
+    if (currentRank >= 0) commit("unrank", {
+      list,
+      game,
+      rank: currentRank
+    });
     if (rank >= 0) {
-      commit("setRank", { list, rank, game });
+      commit("setRank", {
+        list,
+        rank,
+        game
+      });
     }
-    dispatch("listUpdated", { listid });
+    dispatch("listUpdated", {
+      listid
+    });
   },
   /**
    *
@@ -215,7 +274,9 @@ const actions = {
    * @param string username
    * @return promise  Resolves array of game objects
    */
-  getCollection({ commit }, username) {
+  getCollection({
+    commit
+  }, username) {
     console.log(username);
     return new Promise((resolve, reject) => {
       if (!username.length) {
@@ -242,7 +303,13 @@ const actions = {
         });
     });
   },
-  makeNewList({ state, getters, commit }, { name }) {
+  makeNewList({
+    state,
+    getters,
+    commit
+  }, {
+    name
+  }) {
     state.lists.sort((a, b) => {
       return a.id - b.id;
     });
@@ -271,11 +338,24 @@ const actions = {
    * @param {Object} { commit, dispatch, state, getters } Vuex state methods
    * @param {Object} { listid, game }
    */
-  dropGameInList({ commit, dispatch, getters }, { listid, game }) {
+  dropGameInList({
+    commit,
+    dispatch,
+    getters
+  }, {
+    listid,
+    game
+  }) {
     let list = getters.getList(listid);
     let index = list.games.indexOf(game);
-    commit("dropGameFromList", { list, index, game });
-    dispatch("listUpdated", { listid });
+    commit("dropGameFromList", {
+      list,
+      index,
+      game
+    });
+    dispatch("listUpdated", {
+      listid
+    });
   },
   /**
    * Removes duplicates and updates date modified
@@ -284,11 +364,18 @@ const actions = {
    * @param  {Object}   getters Vuex store getters
    * @param  {Number}   listid  id of list that is being updated
    */
-  listUpdated({ commit, getters }, { listid }) {
+  listUpdated({
+    commit,
+    getters
+  }, {
+    listid
+  }) {
     console.log("listupdated: ", listid);
     let list = getters.getList(listid);
     // commit('dedupe', { list });
-    commit("modified", { list });
+    commit("modified", {
+      list
+    });
   }
 };
 
@@ -299,7 +386,9 @@ const mutations = {
    * @param {any} state
    * @param {any} { list }
    */
-  dedupe(state, { list }) {
+  dedupe(state, {
+    list
+  }) {
     list.list = _.uniq(list.list);
     list.games = _.uniq(list.games);
   },
@@ -310,11 +399,17 @@ const mutations = {
    * @param {any} state
    * @param {any} { list, index, game }
    */
-  dropGameFromList(state, { list, index, game }) {
+  dropGameFromList(state, {
+    list,
+    index,
+    game
+  }) {
     if (list.games[index] == game) list.games.splice(index, 1);
     else throw ReferenceError("Game is not at given index.");
   },
-  modified(state, { list }) {
+  modified(state, {
+    list
+  }) {
     list.modifed = Date.now();
   },
   /**
@@ -324,10 +419,18 @@ const mutations = {
    * @param {Number} rank   Rank to assign to game
    * @param {Number} game   ID number of game
    */
-  setRank(state, { list, rank, game }) {
+  setRank(state, {
+    list,
+    rank,
+    game
+  }) {
     list.list.splice(rank, 0, game);
   },
-  unrank(state, { list, game, rank }) {
+  unrank(state, {
+    list,
+    game,
+    rank
+  }) {
     if (list.list[rank] === game) {
       list.list.splice(rank, 1);
     } else {
@@ -337,7 +440,10 @@ const mutations = {
   logRequest(state, req) {
     state.requests.push(req);
   },
-  renameList(state, { list, newName }) {
+  renameList(state, {
+    list,
+    newName
+  }) {
     list.name = newName;
   },
   purgeLists(state) {
@@ -362,7 +468,10 @@ const mutations = {
       return index;
     }
   },
-  setPerPage(state, n) {
+  setUseImgComparisonsMutation(state, t) {
+    state.useImgComparisons = t;
+  },
+  setPerPageMutation(state, n) {
     state.perPage = n;
   },
   setFilter(state, f) {
@@ -442,8 +551,8 @@ const mutations = {
    */
   toggle(state, payload) {
     state.games.find(game => {
-      return game.gameId == payload.id;
-    })[payload.property] =
+        return game.gameId == payload.id;
+      })[payload.property] =
       payload.value;
   }
 };
@@ -455,7 +564,15 @@ export default new Vuex.Store({
   mutations,
   plugins: [
     createPersistedState({
-      paths: ["perPage", "activeFilters", "requests", "games", "view", "lists"]
+      paths: [
+        "perPage",
+        "activeFilters",
+        "requests",
+        "games",
+        "view",
+        "lists",
+        "useImgComparisons"
+      ]
     })
   ]
 });

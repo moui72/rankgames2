@@ -67,6 +67,7 @@
         key="comparing">
         <!-- comparisons -->
         <compare 
+          :images="getUseImgComparisons"
           :incumbant-game="incumbant" 
           :challenger-game="challenger" 
           @pick="pick"/>
@@ -84,7 +85,7 @@
 
 
     <div 
-      v-if="cached < data.games.length"
+      v-if="cached < data.games.length && getUseImgComparisons"
       class="widget mt-3" 
     >
       <h4>Preloading images ({{ cached }} of {{ ranked.length + unranked.length }})</h4>
@@ -165,11 +166,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getList", "getGame"]),
+    ...mapGetters(["getList", "getGame", "getUseImgComparisons"]),
     bufferReady() {
       return (
-        this.rankedCached &&
-        this.cached - this.ranked.length > this.unranked.length / 2
+        (this.rankedCached &&
+          this.cached - this.ranked.length > this.unranked.length / 2) ||
+        !this.getUseImgComparisons
       );
     },
     unranked() {
@@ -202,6 +204,13 @@ export default {
       return Object.keys(this.imageCache).length;
     }
   },
+  watch: {
+    getUseImgComparisons(val) {
+      if (val === true) {
+        this.caching();
+      }
+    }
+  },
   mounted() {
     this.caching();
     this.cacheRanked();
@@ -210,6 +219,10 @@ export default {
   methods: {
     ...mapActions(["setrankto", "renameList", "dropGameInList"]),
     caching() {
+      console.log("caching..");
+      if (!this.getUseImgComparisons) {
+        return;
+      }
       const vm = this;
       try {
         if (this.cacheCycles > 2000) {
@@ -225,7 +238,6 @@ export default {
           })
           .catch(e => {
             vm.caching();
-            console.error(e);
             throw new Error(e);
           });
       } catch (e) {
@@ -249,7 +261,6 @@ export default {
           this.ranked.length / 2 + randomInt(-1, 1)
         );
       }
-      this.cacheImg(this.incumbant);
       return this.incumbantIndex;
     },
     nextIncumbant() {
@@ -263,17 +274,6 @@ export default {
     newPair() {
       this.getIncumbant();
       this.getChallenger();
-      try {
-        this.cacheImg(this.challenger)
-          .then(i => this.imgReady(this.challenger, i))
-          .catch(e => this.cacheImgFail(this.challenger, e));
-        this.cacheImg(this.incumbant)
-          .then(i => this.imgReady(this.incumbant, i))
-          .catch(e => this.cacheImgFail(this.incumbant, e));
-      } catch (e) {
-        console.error("Invalid incumbant or challenger. Retrying.");
-        this.newPair();
-      }
     },
     pick(id) {
       if (id === this.incumbant) {
@@ -367,6 +367,7 @@ export default {
     },
     cacheImgs(n = 5) {
       return new Promise((resolve, reject) => {
+        if (!this.getUseImgComparisons) reject("images turned off");
         let preloaded = 0;
         let errors = 0;
         const doneFn = () => {

@@ -66,7 +66,6 @@
         description="How many games to show on each page.
           Lower values may provide better performance.">
         <b-form-select 
-          v-model="perPage"
           @change="setPerPage" 
         >
           <option 
@@ -77,6 +76,19 @@
           </option>
         </b-form-select>
       </b-form-group>
+
+      <b-form-group
+        label="Images in game comparison widget"
+        description="Not using images may improve performance and will reduce 
+        load times, but will degrade the sighted user's experience to some 
+        extent."
+      >
+        <b-form-checkbox 
+          :checked="getUseImgComparisons"
+          @change="setUseImgComparisons"
+        > Use images in comparisons </b-form-checkbox>
+      </b-form-group>
+
     </b-modal>
 
     <transition
@@ -95,7 +107,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import RgFooter from "./components/footer.vue";
 import Icon from "vue-awesome";
 
@@ -110,13 +122,15 @@ export default {
     return {
       title: "Rank Games",
       version: "1.0.1",
-      focus: false,
-      perPage: 24
+      focus: false
     };
+  },
+  computed: {
+    ...mapGetters(["getPerPage", "getUseImgComparisons"])
   },
   methods: {
     // @TODO make action to use here instead of using mutation directly
-    ...mapMutations(["setPerPage"]),
+    ...mapActions(["setPerPage", "setUseImgComparisons"]),
 
     back() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
@@ -168,5 +182,8 @@ html {
 }
 .move {
   transition: transform 1s;
+}
+legend {
+  font-weight: 600;
 }
 </style>
