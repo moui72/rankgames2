@@ -112,6 +112,7 @@ import RgFooter from "./components/footer.vue";
 import Icon from "vue-awesome";
 
 //@TODO ROUTES!!!!11 (library, list)
+// @TODO add ability to cache in backgournd while comparing w/out images
 export default {
   name: "App",
   components: {
