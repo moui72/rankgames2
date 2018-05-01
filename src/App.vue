@@ -9,7 +9,6 @@
         {{ title }}
       </b-navbar-brand>
       <span class="warning float-right">
-        Alpha
         <small>{{ version }}</small>
       </span>
       <b-collapse 
@@ -147,8 +146,7 @@ import { mapActions, mapGetters } from "vuex";
 import RgFooter from "./components/footer.vue";
 import Icon from "vue-awesome";
 
-//@TODO ROUTES!!!!11 (library, list)
-// @TODO add ability to cache in backgournd while comparing w/out images
+// @TODO add ability to export/import data from file
 export default {
   name: "App",
   components: {

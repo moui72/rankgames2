@@ -94,6 +94,9 @@ const state = {
 };
 
 const getters = {
+  dump: state => {
+    return JSON.stringify(state);
+  },
   getLists: state => {
     return state.lists;
   },

@@ -14,6 +14,65 @@
     <b-list-group 
       class="base mb-2" 
     >
+      <b-list-group-item
+        variant="dark"
+      >
+        
+        <div 
+          class="row small" 
+        >
+
+          <div class="col-1 ">
+            <b-btn 
+              variant="primary" 
+              size="sm"
+              @click="changeOrder()"
+            >
+              Order: {{ order }}
+            </b-btn>
+          </div>
+          <div 
+            class="offset-2 col-3 text-right" 
+            size="sm">
+            <b-btn 
+              :disabled="view == 'display'" 
+              block
+              variant="link"
+              size="sm"
+              @click="setView('display')"
+              
+            >
+              Display
+            </b-btn>
+          </div>
+          <div class="col-3 text-right">
+            <b-btn 
+              :disabled="view == 'plaintext'"
+              block
+              variant="link" 
+              size="sm"
+              @click="setView('plaintext')"
+              
+            >
+              Plain text
+            </b-btn>
+          </div>
+          <div class="col-3 text-right">
+            <b-btn 
+              :disabled="view == 'forum'"
+              block
+              variant="link" 
+              size="sm"
+              @click="setView('forum')"
+            >
+              BGGCode
+            </b-btn>
+          </div>
+
+        </div>
+        
+
+      </b-list-group-item>
       <transition-group 
         :duration="{out: 200, in: 400}"
         name="next-game" 
@@ -22,11 +81,32 @@
         leave-active-class="animated fadeOut"
       >
         <template v-for="game in pagedRanked">
+          
           <b-list-group-item 
             :key="game" 
             class="ranked-game-item"
           >
-            <div class="row align-items-center">
+            <div 
+              v-if="view == 'plaintext'" 
+            >
+              {{ rankOf(game) }}. 
+              {{ gameData(game).name }} 
+              ({{ gameData(game).rating }}/10) 
+              Published in {{ gameData(game).yearPublished }}
+
+            </div>
+            <div 
+              v-if="view == 'forum'" 
+              class="pre"
+            >
+              [size=12][b][thing={{ game }}]{{ rankOf(game) }}. {{ gameData(game).name }}[/thing] <span v-if="gameData(game).numPlays > 0">- [COLOR=#00CC00]{{ gameData(game).numPlays }} plays[/COLOR]</span> - [BGCOLOR={{ ratingColor(gameData(game).rating) }}] {{ gameData(game).rating }}[/BGCOLOR][/b][/size]
+              [size=7][b]{{ gameData(game).yearPublished }}[/b][/size]
+              [imageID={{ getImageId(game) }} square inline]
+            </div>
+            <div 
+              v-if="view == 'display'" 
+              class="row align-items-center"
+            >
               <div class="rank col-2 text-center text-primary">
                 {{ rankOf(game) }}
               </div>
@@ -38,7 +118,6 @@
               <div 
                 v-show="!rerank(game)"
                 class="col-6 col-md-5 offset-md-1 col-lg-4 offset-lg-2 col-xl-3 offset-xl-3 text-right"
-                
               >
                 <b-button-toolbar 
                   justify       
@@ -182,23 +261,50 @@ export default {
       rankedPage: 1,
       rankedPerPage: 10,
       settingRank: 0,
-      setRankTo: 1
+      setRankTo: 1,
+      order: "ASC",
+      view: "display"
     };
   },
 
   computed: {
     ...mapGetters(["getGame"]),
     pagedRanked() {
+      if (this.view != "display") return this.ranked;
       return this.ranked.slice(
         (this.rankedPage - 1) * this.rankedPerPage,
         this.rankedPage * this.rankedPerPage
       );
     },
     ranked() {
-      return this.list;
+      if (this.order == "ASC") return this.list;
+      else return this.list.slice().reverse();
     }
   },
   methods: {
+    ratingColor(r) {
+      let colors = [
+        "#DB303B",
+        "#DF4751",
+        "#5369A2",
+        "#1D8ACD",
+        "#2FC482",
+        "#249563"
+      ];
+      return colors[
+        r > 8 ? 0 : r > 7 ? 1 : r > 6 ? 2 : r > 4 ? 3 : r > 2 ? 4 : 5
+      ];
+    },
+    getImageId(id) {
+      let stringr = this.gameData(id).image;
+      let reg = /pic([0-9]+)\.(jpg|png|gif)/;
+      let arr = reg.exec(stringr);
+      console.log(arr);
+      return arr[1];
+    },
+    setView(v) {
+      this.view = v;
+    },
     gameData(id) {
       try {
         if (typeof id == "undefined" || id == 0)
@@ -216,7 +322,7 @@ export default {
     },
     rankOf(gameId) {
       return (
-        this.ranked.findIndex(game => {
+        this.list.findIndex(game => {
           return game == gameId;
         }) + 1
       );
@@ -242,8 +348,21 @@ export default {
     },
     clearRerank() {
       this.settingRank = 0;
+    },
+    changeOrder() {
+      if (this.order == "ASC") this.order = "DSC";
+      else this.order = "ASC";
     }
   }
 };
 </script>    
-<style lang="scss"></style>
+<style lang="scss">
+.list-group-item-dark .disabled {
+  color: #000;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.pre {
+  white-space: pre;
+}
+</style>
