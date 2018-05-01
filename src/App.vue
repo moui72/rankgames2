@@ -60,22 +60,41 @@
       title="Settings"
       ok-title="Close"
       ok-variant="primary"
-      ok-only>
-      <b-form-group
-        label="Games per page"
-        description="How many games to show on each page.
-          Lower values may provide better performance.">
-        <b-form-select 
-          @change="setPerPage" 
+      ok-only
+      
+    >
+      <div
+        class="form-group"
+      >
+        <legend 
+          for="sel" 
+          class="col-form-label pt-0"
         >
-          <option 
-            v-for="n in 9" 
+          Games per page
+        </legend>
+        <select 
+          id="sel"
+          class="form-control"
+          aria-describedby="perPageDescription"
+          @change="setPerPage"
+        >
+          <option
+            v-for="n in 9"
+            :selected="n * 12 == getPerPage" 
             :value="n*12" 
-            :key="n">
+            :key="n"
+          >
             {{ n * 12 }} items
           </option>
-        </b-form-select>
-      </b-form-group>
+        </select>
+        <small 
+          id="perPageDescription" 
+          class="form-text text-muted"
+        >
+          How many games to show on each page.
+          Lower values may provide better performance.
+        </small>
+      </div>
 
       <b-form-group
         label="Images in game comparison widget"
@@ -86,7 +105,24 @@
         <b-form-checkbox 
           :checked="getUseImgComparisons"
           @change="setUseImgComparisons"
-        > Use images in comparisons </b-form-checkbox>
+        > 
+          Use images in comparisons 
+        </b-form-checkbox>
+      </b-form-group>
+
+      <b-form-group
+        label="Background loading"
+        description="This setting will allow you to make comparisons without 
+        waiting for images to cache. Images will not be shown until they are 
+        done loading. This setting requires that images are turned on."
+      >
+        <b-form-checkbox 
+          :checked="getBackgroundLoad && getUseImgComparisons"
+          :disabled="!getUseImgComparisons"
+          @change="setBackgroundLoad"
+        > 
+          Load images in background
+        </b-form-checkbox>
       </b-form-group>
 
     </b-modal>
@@ -127,11 +163,15 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getPerPage", "getUseImgComparisons"])
+    ...mapGetters(["getPerPage", "getUseImgComparisons", "getBackgroundLoad"])
   },
   methods: {
     // @TODO make action to use here instead of using mutation directly
-    ...mapActions(["setPerPage", "setUseImgComparisons"]),
+    ...mapActions(["setPerPage", "setUseImgComparisons", "setBackgroundLoad"]),
+
+    setSelect() {
+      this.$refs.sel.$el.selectedIndex = this.getPerPage / 12 - 1;
+    },
 
     back() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");

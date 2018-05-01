@@ -32,7 +32,6 @@
             :left="false"
             mode="out-in"/>
         </transition>
-
       </div>
     </div>
   </div>

@@ -27,21 +27,21 @@
             class="ranked-game-item"
           >
             <div class="row align-items-center">
-              <div class="rank col-2 text-right text-primary">
+              <div class="rank col-2 text-center text-primary">
                 {{ rankOf(game) }}
               </div>
               <div class="col-4">
-                <h4>
+                <strong>
                   {{ gameData(game).name }}
-                </h4>
+                </strong>
               </div>
               <div 
                 v-show="!rerank(game)"
-                class="col-6 text-left"
+                class="col-6 col-md-5 offset-md-1 col-lg-4 offset-lg-2 col-xl-3 offset-xl-3 text-right"
                 
               >
                 <b-button-toolbar 
-                  size="sm"                  
+                  justify       
                 >
 
                   <b-button-group 
@@ -64,6 +64,8 @@
                         Set this game's rank to #{{ rankOf(game) - 1 }}
                       </span>
                     </b-btn>
+                  </b-button-group>
+                  <b-button-group>
                     <b-btn 
                       variant="primary"
                       @click="reranking(game)"
@@ -73,7 +75,8 @@
                         Set this game's rank to a given rank
                       </span>
                     </b-btn>
-
+                  </b-button-group>
+                  <b-button-group>
                     <b-btn 
                       variant="warning" 
                       class="weaker"
@@ -97,7 +100,6 @@
                   </b-button-group>
           
                   <b-button-group 
-                    class="ml-2" 
                   >
                     <b-btn 
                       variant="danger" 

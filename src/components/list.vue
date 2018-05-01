@@ -63,11 +63,11 @@
       enter-active-class="animated slideInLeft" 
       leave-active-class="animated slideOutLeft">
       <div 
-        v-if="bufferReady" 
+        v-if="bufferReady || getBackgroundLoad" 
         key="comparing">
         <!-- comparisons -->
         <compare 
-          :images="getUseImgComparisons"
+          :images="useImgs"
           :incumbant-game="incumbant" 
           :challenger-game="challenger" 
           @pick="pick"/>
@@ -92,7 +92,7 @@
       <h5>Buffer</h5>
       <b-progress 
         :value="cached" 
-        :max="ranked.length + 5" 
+        :max="bufferSize" 
         variant="success" 
         class="mb-3">
         <b-progress-bar :value="Object.keys(imageCache).length">
@@ -166,11 +166,23 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getList", "getGame", "getUseImgComparisons"]),
+    ...mapGetters([
+      "getList",
+      "getGame",
+      "getUseImgComparisons",
+      "getBackgroundLoad"
+    ]),
+    bufferSize() {
+      return this.data.games.length / 2;
+    },
+    useImgs() {
+      if (!this.getUseImgComparisons) return false;
+      return this.bufferReady;
+    },
     bufferReady() {
       return (
         (this.rankedCached &&
-          this.cached - this.ranked.length > this.unranked.length / 2) ||
+          this.cached - this.ranked.length > this.bufferSize / 2) ||
         !this.getUseImgComparisons
       );
     },
