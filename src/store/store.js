@@ -139,7 +139,7 @@ const getters = {
     if (getters.currentView == "all") return state.games;
     return getters[state.views[getters.currentView].getter];
   },
-  allGames: (state, getters) => {
+  allGames: state => {
     return state.games;
   },
   filteredGames: state => {
