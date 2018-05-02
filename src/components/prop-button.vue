@@ -35,11 +35,11 @@ export default {
   name: "PropButton",
   components: { Icon },
   props: {
-    property: String,
-    value: Boolean,
-    id: Number,
-    size: String,
-    disabled: Boolean
+    property: { type: String, required: true },
+    value: { type: Boolean, required: true },
+    id: { type: Number, default: 0 },
+    size: { type: String, default: "sm" },
+    disabled: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -81,16 +81,6 @@ export default {
       return (!this.value ? "outline-" : "") + this.variants[this.property];
     },
     text() {
-      let texts = {
-        visible: {
-          true: "Hide this game",
-          false: "Show this game"
-        },
-        rankable: {
-          true: "Make unrankable",
-          false: "Make rankable"
-        }
-      };
       return this.texts[this.property][this.value];
     }
   },

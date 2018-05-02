@@ -3,7 +3,7 @@
     id="import"
     ref="importer"
     :busy="loading"
-    title="Import"
+    title="Importing games"
     ok-only
     ok-title="Close"
     ok-variant="warning"
@@ -18,7 +18,10 @@
       v-show="!loading"
       @keyup.enter="fetch()">
       <div v-show="preImportGames.length < 1">
-        <b-form-group>
+        <b-form-group 
+          label="Import from BGG"
+          description="Enter the BGG username attached to the collection you want to import. If you import another collection subsequently, any new games in that collection will be added."
+        >
           <b-input
             ref="focusMe"
             v-model="username"

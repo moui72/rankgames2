@@ -52,6 +52,7 @@ const state = {
     visible: "vbln",
     rankable: "rbln"
   },
+  introduced: false,
   view: "dfl",
   views: {
     dfl: {
@@ -94,6 +95,9 @@ const state = {
 };
 
 const getters = {
+  wasIntroduced: state => {
+    return state.introduced;
+  },
   dump: state => {
     return JSON.stringify(state);
   },
@@ -134,6 +138,9 @@ const getters = {
   games: (state, getters) => {
     if (getters.currentView == "all") return state.games;
     return getters[state.views[getters.currentView].getter];
+  },
+  allGames: (state, getters) => {
+    return state.games;
   },
   filteredGames: state => {
     return state.games.filter(game => {
@@ -214,6 +221,9 @@ const getters = {
 };
 
 const actions = {
+  setIntroduced({ commit }) {
+    commit("setIntroducedMutation");
+  },
   setUseImgComparisons({ commit }, value) {
     commit("setUseImgComparisonsMutation", value);
   },
@@ -352,6 +362,9 @@ const actions = {
 };
 
 const mutations = {
+  setIntroducedMutation(state) {
+    state.introduced = !state.introduced;
+  },
   /**
    * Removes duplicate games from ranked and unranked set in list
    *
@@ -521,6 +534,7 @@ export default new Vuex.Store({
   plugins: [
     createPersistedState({
       paths: [
+        "introduced",
         "perPage",
         "activeFilters",
         "requests",

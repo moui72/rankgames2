@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div 
+      v-if="!allGames.length < 1" 
+      class="my-3 widget"
+    >
+      <h2>First time here?</h2>
+      <p>Your collection is empty. Click "import" below to get started.</p>
+    </div>
     <div class="my-3 header widget">
       <!-- header -->
       <b-row>
