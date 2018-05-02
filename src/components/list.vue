@@ -51,7 +51,7 @@
             @keyup.enter.native="rename()" 
             @keyup.esc.native="cancelRename()"/>
           <h2 v-show="!editingName">
-            <b-link to="/lists">Lists</b-link> &raquo; "{{ data.name }}"
+            <b-link to="/lists">Lists</b-link> <span v-html="'&raquo; '"/>"{{ data.name }}"
           </h2>
         </div>
       </div>

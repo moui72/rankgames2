@@ -1,31 +1,34 @@
 <template>
   <div class="filters">
-    <div  v-show="getActiveFilters.length" >
+    <div v-show="getActiveFilters.length" >
       <h4>active filters</h4>
       <template v-for="filter in getActiveFilters">
         <b-btn
-          :key="filter"
           v-if="filter.substr(0,3) == 'pcf'"
-          @click="clearPCF"
+          :key="filter"
           size="sm"
           variant="danger"
-          >
-          &times;
+          @click="clearPCF"
+        >
+          <span v-html="'&times;'"/>
           <span class="sr-only">Remove filter:</span>
-          {{getFilter('pcf').text}}
-          {{pcfArgs(filter)}}
+          {{ getFilter('pcf').text }}
+          {{ pcfArgs(filter) }}
         </b-btn>
-        <b-btn v-else-if="filter.substr(0,2) == 'ur'" :key="filter"></b-btn>
+        <b-btn 
+          v-else-if="filter.substr(0,2) == 'ur'" 
+          :key="filter"/>
         <b-btn
           v-else
           :key="filter"
-          @click="setFilter(filter)"
           :title="'remove \'' + getFilter(filter).text + '\' filter'"
-          size="sm" variant="danger">
+          size="sm"
+          variant="danger" 
+          @click="setFilter(filter)">
           <span class="align-top">
-            &times;
+            <span v-html="'&times;'"/>
             <span class="sr-only">Remove filter:</span>
-            {{getFilter(filter).text}}
+            {{ getFilter(filter).text }}
           </span>
         </b-btn>
       </template>
@@ -39,20 +42,20 @@
 </template>
 
 <script>
-import Icon from 'vue-awesome';
-import { mapGetters, mapMutations } from 'vuex';
+import Icon from "vue-awesome";
+import { mapGetters, mapMutations } from "vuex";
 export default {
-  name: 'Filters',
+  name: "Filters",
   components: { Icon },
   computed: {
-    ...mapGetters(['getActiveFilters', 'getFilter'])
+    ...mapGetters(["getActiveFilters", "getFilter"])
   },
   methods: {
-    ...mapMutations(['setFilter', 'clearPCF']),
+    ...mapMutations(["setFilter", "clearPCF"]),
     pcfArgs(f) {
-      let arr = f.split('-');
-      if (arr[0] == 'pcf') {
-        return '(' + arr[1] + (arr.length > 2 ? '-' + arr[2] : '') + ')';
+      let arr = f.split("-");
+      if (arr[0] == "pcf") {
+        return "(" + arr[1] + (arr.length > 2 ? "-" + arr[2] : "") + ")";
       } else {
         return null;
       }
@@ -63,23 +66,22 @@ export default {
 <style lang="scss">
 h4 {
   font-size: 1rem;
-  color: rgba(0,0,0,.6)
+  color: rgba(0, 0, 0, 0.6);
 }
-.filters{
-  text-align:right;
-  font-size: .65rem;
+.filters {
+  text-align: right;
+  font-size: 0.65rem;
 
-  .btn-sm{
-    font-size: .65rem;
+  .btn-sm {
+    font-size: 0.65rem;
   }
   .fa-icon {
-    height: .65rem;
+    height: 0.65rem;
   }
 
-  .btn{
-    margin-left: .5rem;
-    margin-bottom: .5rem;
+  .btn {
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
-
 </style>

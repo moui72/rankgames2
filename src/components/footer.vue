@@ -42,7 +42,7 @@
       </b-col>
     </b-row>
     <div class="mt-3 small">
-      Copyright &copy; Tyler Peckenpaugh 2017-2018
+      Copyright <span v-html="'&copy;'"/> Tyler Peckenpaugh 2017-2018
     </div>
   </div>
 </template>

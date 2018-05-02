@@ -2,17 +2,7 @@
   <div>
     <div class="widget my-3">
       <h2>Your lists</h2>
-      <p>Sorted by 
-        {{ 
-          byDate 
-            ? 'date created ' + (sortAsc 
-              ? '(Old &rarr; New)' 
-              : '(New &rarr; Old)')
-            : 'name ' + (sortAsc 
-              ? '(A &rarr; Z)' 
-              : '(Z &rarr; A)' )
-        }}
-      </p>
+      <p v-html="'Sorted by ' + sortString"/>
       <b-button-toolbar class="mt-3">
         <b-button-group>
           <b-btn 
@@ -50,7 +40,7 @@
             variant="success"
             @click="toggleDir()"
           >
-            {{ sortAsc ? '&darr;' : '&uarr;' }}
+            <span v-html="sortAsc ? '&darr;' : '&uarr;'"/>
           </b-btn>
         </b-button-group>
       </b-button-toolbar>
@@ -113,7 +103,7 @@
                   }" 
                   variant="danger"
                 >
-                  &times; delete
+                  <span v-html="'&times;'"/> delete
                 </b-btn>
                 <b-btn 
                   :to="'list/' + list.id" 
@@ -161,6 +151,12 @@ export default {
   },
   computed: {
     ...mapGetters(["getLists", "rankableGames"]),
+    sortString() {
+      return this.byDate
+        ? "date created " +
+            (this.sortAsc ? "(Old &rarr; New)" : "(New &rarr; Old)")
+        : "name " + (this.sortAsc ? "(A &rarr; Z)" : "(Z &rarr; A)");
+    },
     lists() {
       if (this.byDate) return this.listsByDate();
       return this.listsByName();

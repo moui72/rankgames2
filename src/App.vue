@@ -47,7 +47,7 @@
           v-if="!isHome()" 
           class="float-right">
           <b-nav-item @click="back">
-            &larr; Back
+            <span v-html="'&larr;'"/> Back
           </b-nav-item>
         </b-navbar-nav>
       </b-collapse>

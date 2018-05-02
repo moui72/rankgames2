@@ -4,7 +4,11 @@
       <!-- header -->
       <b-row>
         <b-col>
-          <h2>Library <span class="small text-primary">&raquo; {{ viewObj.text }}</span></h2>
+          <h2>Library
+            <span class="small text-primary">
+              <span v-html="'&raquo'"/> {{ viewObj.text }}
+            </span>
+          </h2>
         </b-col>
         <b-col>
           <filters/>

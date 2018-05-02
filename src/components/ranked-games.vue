@@ -128,7 +128,7 @@
                     <b-btn 
                       variant="success" 
                       @click="setrank(game, 0)">
-                      &#10514;
+                      <span v-html="'&#10514;'"/>
                       <span class="sr-only">
                         Set this game's rank to #1
                       </span>
@@ -138,7 +138,7 @@
                       class="weaker"
                       @click="setrank(game, rankOf(game) - 2)"
                     >
-                      &uarr;
+                      <span v-html="'&uarr;'"/>
                       <span class="sr-only">
                         Set this game's rank to #{{ rankOf(game) - 1 }}
                       </span>
@@ -161,7 +161,7 @@
                       class="weaker"
                       @click="setrank(game, rankOf(game))"
                     >
-                      &darr;
+                      <span v-html="'&darr;'"/>
                       <span class="sr-only">
                         Set this game's rank to #{{ rankOf(game) + 1 }}
                       </span>
@@ -170,7 +170,8 @@
                       variant="warning" 
                       @click="setrank(game, ranked.length)"
                     >
-                      &#10515;
+                      <span v-html="'&#10515;'"/>
+              
                       <span class="sr-only">
                         Set this game's rank to #{{ ranked.length }}
                       </span>
@@ -184,7 +185,7 @@
                       variant="danger" 
                       @click="setrank(game, -1)"
                     >
-                      &times;
+                      <span v-html="'&times;'"/>
                       <span class="sr-only">
                         Remove this game from the ranked list
                       </span>
@@ -213,13 +214,13 @@
                       variant="success" 
                       @click="reranked()"
                     >
-                      &#10003;
+                      <span v-html="'&#10003;'"/>
                     </b-btn>
                     <b-btn 
                       variant="warning" 
                       @click="clearRerank()"
                     >
-                      &times;
+                      <span v-html="'&times;'"/>
                     </b-btn>
                   </b-input-group-append>
                 </b-input-group>
