@@ -5,19 +5,25 @@
         <slot name="picture">
           <b-img-lazy
             v-if="thumb"
-            blank-src
             :alt="'Small image of box cover for ' + name"
             :src="thumb"
+            blank-src
             class="border-primary"/>
-          <b-img v-else
-            blank :alt="'No box cover image available for '+ name"
-            :src="thumb" class="border-primary"
-            height="170" blank-color="rgba(0,0,0,.15)"/>
+          <b-img 
+            v-else
+            :alt="'No box cover image available for '+ name" 
+            :src="thumb"
+            blank 
+            class="border-primary"
+            height="170" 
+            blank-color="rgba(0,0,0,.15)"/>
         </slot>
       </div>
       <div>
         <div class="px-1 mt-1">
-          <h3 class="text-center">{{truncName}}</h3>
+          <h3 class="game-name d-block text-truncate">
+            {{ name }}
+          </h3>
         </div>
       </div>
       <div class="align-bottom">
@@ -27,16 +33,17 @@
               <template v-for="prop in toggles">
                 <prop-button
                   :key="prop"
-                  class="mx-1"
                   :property="prop"
                   :value="getProp(id, prop)"
-                  :id="id">
-                </prop-button>
+                  :id="id"
+                  class="mx-1"/>
               </template>
               <div class="mx-1">
-                <b-btn variant="info" @click="info(id)">
-                  <icon name="info-circle"></icon>
-                  <span class="sr-only">view details for {{name}}</span>
+                <b-btn 
+                  variant="info" 
+                  @click="info(id)">
+                  <icon name="info-circle"/>
+                  <span class="sr-only">view details for {{ name }}</span>
                 </b-btn>
               </div>
             </b-button-group>
@@ -49,43 +56,43 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import PropButton from './prop-button.vue';
-import Icon from 'vue-awesome';
+import { mapGetters } from "vuex";
+import PropButton from "./prop-button.vue";
+import Icon from "vue-awesome";
 
 export default {
-  name: 'Game',
-  props: { id: Number },
-  data() {
-    return {};
-  },
+  name: "Game",
   components: {
     PropButton,
     Icon
   },
+  props: { id: { type: Number, required: true } },
+  data() {
+    return {};
+  },
   computed: {
-    ...mapGetters(['toggles', 'getProp', 'getGame']),
+    ...mapGetters(["toggles", "getProp", "getGame"]),
     name() {
       return this.getGame(this.id).name;
     },
     thumb() {
-      return this.getProp(this.id, 'thumbnail');
+      return this.getProp(this.id, "thumbnail");
     },
     truncName() {
       if (this.name.length < 25) return this.name;
-      if (this.name.split(' ').length < 6)
-        return this.name.substr(0, 15) + '...' + this.name.substr(-5);
-      let name = this.name.split(' ');
-      let nameArr = name.slice(0, 3).concat(['...'], name.slice(-2));
-      name = nameArr.join(' ');
+      if (this.name.split(" ").length < 6)
+        return this.name.substr(0, 15) + "..." + this.name.substr(-5);
+      let name = this.name.split(" ");
+      let nameArr = name.slice(0, 3).concat(["..."], name.slice(-2));
+      name = nameArr.join(" ");
       if (name.length < 25) return name;
-      name = name.substr(0, 15) + '...' + name.substr(-5);
-      return name.replace(/(\.\.\.)+/, '...');
+      name = name.substr(0, 15) + "..." + name.substr(-5);
+      return name.replace(/(\.\.\.)+/, "...");
     }
   },
   methods: {
     info: function(id) {
-      this.$router.push('/game/' + id);
+      this.$router.push("/game/" + id);
     }
   }
 };
@@ -119,7 +126,9 @@ export default {
   }
   h3 {
     width: 100%;
-    font-size: 1.3rem;
+    max-width: 190px;
+    font-size: 1.2rem;
+    margin: 0.75rem auto;
   }
   img {
     border-top-left-radius: 0.2rem;

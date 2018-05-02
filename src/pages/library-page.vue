@@ -13,8 +13,7 @@ export default {
   components: {
     RgFooter,
     Library
-  },
-  props: { id: { type: Number, required: true } }
+  }
 };
 </script>
 <style lang="scss"></style>

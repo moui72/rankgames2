@@ -14,6 +14,7 @@ import GameDetail from "./pages/game-detail.vue";
 import Lists from "./pages/lists-page.vue";
 import Home from "./pages/home.vue";
 import ListPage from "./pages/list-page.vue";
+import LibraryPage from "./pages/library-page.vue";
 
 Vue.use(VuejsDialog);
 Vue.use(VueRouter);
@@ -29,6 +30,7 @@ const routes = [
   { path: "/lists", component: Lists },
   { path: "/game/:id", component: GameDetail },
   { path: "/list/:id", component: ListPage },
+  { path: "/lib", component: LibraryPage, name: "Library" },
   { path: "/", component: Home, name: "Home" }
 ];
 const router = new VueRouter({ routes });

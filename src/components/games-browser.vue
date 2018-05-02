@@ -118,7 +118,7 @@ export default {
       perPage: "getPerPage"
     }),
     ranking() {
-      return this.ids == [] ? false : true;
+      return this.ids.length > 0;
     },
     pages() {
       if (this.ids) {
