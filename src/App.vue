@@ -389,4 +389,16 @@ html {
 legend {
   font-weight: 600;
 }
+$theme-colors: (
+  "primary": #0077a7,
+  "danger": #ff4136,
+  "secondary": #1e097c,
+  "other": #12580c,
+  "info": #727eb6
+);
+$body-bg: "#ccc";
+@import "node_modules/bootstrap/scss/bootstrap";
+html {
+  background-color: $body-bg;
+}
 </style>
