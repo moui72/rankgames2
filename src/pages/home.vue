@@ -1,7 +1,17 @@
 <template>
   <div>
-    <intro v-if="!wasIntroduced"/>
-    <re v-else/>
+    <transition
+      :duration="{in: 300, out:150}"
+      name="page-change"
+      appear
+      mode="out-in"
+      enter-active-class="animated slideInLeft"
+      leave-active-class="animated slideOutLeft"
+    >
+      <intro v-if="!wasIntroduced"/>
+      <re v-else/>
+    </transition>
+    
     <rg-footer/>
   </div>
 </template>
@@ -22,7 +32,7 @@ export default {
     Re
   },
   computed: {
-    ...mapGetters["wasIntroduced"]
+    ...mapGetters(["wasIntroduced"])
   }
 };
 </script>

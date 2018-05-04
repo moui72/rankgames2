@@ -23,16 +23,34 @@
         Let's get started!
       </b-btn>
     </div>
-    
+    <b-form-group
+      description="If you want this message to be replaced by shortcuts, 
+      uncheck this box. If you want to turn it back on you can do so in 
+      settings."
+    >
+      <b-form-checkbox 
+        :checked="!wasIntroduced"
+        @change="setIntroduced"
+      > 
+        Show welcome message
+      </b-form-checkbox>
+    </b-form-group>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 export default {
-  name: "Intro"
+  name: "Intro",
+  computed: {
+    ...mapGetters(["wasIntroduced"])
+  },
+  methods: {
+    ...mapActions(["setIntroduced"])
+  }
 };
 </script>
 <style lang="scss">
-div {
-}
+
 </style>

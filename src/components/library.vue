@@ -5,7 +5,17 @@
       class="my-3 widget"
     >
       <h2>First time here?</h2>
-      <p>Your collection is empty. Click "import" below to get started.</p>
+      <p>
+        Your collection is empty. 
+        <b-btn 
+          v-b-modal="'import'"
+          is="a" 
+          href="#" 
+          variant="link"
+          v-html="'Import'"
+        /> 
+        some games to get started.
+      </p>
     </div>
     <div class="my-3 header widget">
       <!-- header -->
@@ -87,7 +97,11 @@
 
       <p class="mt-3">
         The current view determines which games are visible.
-        Currently: {{ viewObj.details }}
+        Currently visible: {{ viewObj.details }}
+      </p>
+
+      <p class="mt-3">
+        Filters will categorically remove games from the ones that are rankable.
       </p>
 
       <p>

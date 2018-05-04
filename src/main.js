@@ -16,24 +16,43 @@ import Home from "./pages/home.vue";
 import ListPage from "./pages/list-page.vue";
 import LibraryPage from "./pages/library-page.vue";
 
+
 Vue.use(VuejsDialog);
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
 
-Vue.filter("formatDate", function(value) {
+Vue.filter("formatDate", function (value) {
   if (value) {
     return moment(value).format("MM/DD/YYYY hh:mm");
   }
 });
 
-const routes = [
-  { path: "/lists", component: Lists },
-  { path: "/game/:id", component: GameDetail },
-  { path: "/list/:id", component: ListPage },
-  { path: "/lib", component: LibraryPage, name: "Library" },
-  { path: "/", component: Home, name: "Home" }
+const routes = [{
+    path: "/lists",
+    component: Lists
+  },
+  {
+    path: "/game/:id",
+    component: GameDetail
+  },
+  {
+    path: "/list/:id",
+    component: ListPage
+  },
+  {
+    path: "/lib",
+    component: LibraryPage,
+    name: "Library"
+  },
+  {
+    path: "/",
+    component: Home,
+    name: "Home"
+  }
 ];
-const router = new VueRouter({ routes });
+const router = new VueRouter({
+  routes
+});
 
 const app = new Vue({
   el: "#app",
