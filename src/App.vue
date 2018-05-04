@@ -1,15 +1,18 @@
 <template>
   <div id="app">
     <b-navbar 
+      class="sans"
       toggleable="md" 
       variant="primary" 
       type="dark">
       <b-navbar-toggle target="nav_dropdown_collapse"/>
-      <b-navbar-brand href="#">
+      <b-navbar-brand 
+        to="/" 
+        class="brand">
         {{ title }}
       </b-navbar-brand>
-      <span class="warning float-right">
-        <small>{{ version }}</small>
+      <span class="version mr-2">
+        <small>v{{ version }}</small>
       </span>
       <b-collapse 
         id="nav_dropdown_collapse"
@@ -81,6 +84,7 @@
           </b-nav-item>
         </b-navbar-nav>
       </b-collapse>
+
     </b-navbar>
 
     <b-modal
@@ -248,7 +252,7 @@ export default {
   },
   data() {
     return {
-      title: "Rank Games",
+      title: "Rank Games 2",
       version: "1.0.2",
       focus: false,
       fileName: "my-rg-data",
@@ -347,9 +351,44 @@ export default {
 </script>
 
 <style lang="scss">
+$theme-colors: (
+  "primary": #0033a7,
+  "danger": #ff4136,
+  "secondary": rgb(180, 90, 200),
+  "other": #12580c,
+  "info": rgb(220, 100, 180),
+  "brand": rgb(255, 255, 155)
+);
+$body-bg: "#ccc";
+@import url("https://fonts.googleapis.com/css?family=Abel|Bitter|Teko");
+
+@import "node_modules/bootstrap/scss/bootstrap";
+$font-family-sans-serif: "Abel", "Helvetica", "Tahoma", "-apple-system",
+  sans-serif;
+$font-family-serif: "Bitter", "Times New Roman", serif;
+$font-family-title: "Teko", "Helvetica", "Tahoma", sans-serif;
 body,
 html {
   background-color: #ccc;
+  font-family: $font-family-serif;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-family-sans-serif;
+  font-weight: bolder;
+}
+.sans {
+  font-family: $font-family-sans-serif;
+}
+.brand {
+  font-family: $font-family-title;
+  font-size: 2rem;
+  color: theme-color("brand") !important;
+  text-shadow: 2px 2px 5px #000;
 }
 .shadow {
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
@@ -372,15 +411,23 @@ html {
     }
   }
 }
-.warning {
-  font-variant: small-caps;
-  background-color: #339;
-  color: #ee9;
-  padding: 0.5rem;
-  font-size: 0.6rem;
-  border-radius: 0.5rem;
+.btn,
+.badge {
+  font-family: $font-family-sans-serif;
+}
+
+.version {
+  font-family: $font-family-serif;
+  background-color: lighten(theme-color("secondary"), 10%);
+  color: theme-color("black");
+  padding: 0.25rem;
+  font-size: 0.7rem;
+  border-radius: 0.25rem;
+  margin: 0;
+
   small {
     font-variant: normal;
+    font-weight: bold;
   }
 }
 .move {
@@ -389,15 +436,7 @@ html {
 legend {
   font-weight: 600;
 }
-$theme-colors: (
-  "primary": #0077a7,
-  "danger": #ff4136,
-  "secondary": #1e097c,
-  "other": #12580c,
-  "info": #727eb6
-);
-$body-bg: "#ccc";
-@import "node_modules/bootstrap/scss/bootstrap";
+
 html {
   background-color: $body-bg;
 }

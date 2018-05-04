@@ -7,7 +7,7 @@
         <b-button-group>
           <b-btn 
             v-b-modal="'makeList'"
-            variant="info" 
+            variant="primary" 
           >
             Make new list
           </b-btn>
@@ -34,10 +34,10 @@
             variant="primary"
             @click="toggleSort()"
           >
-            Sort by {{ byDate ? 'name' : 'date' }}
+            Sorting by {{ byDate ? 'name' : 'date' }}
           </b-btn>
           <b-btn 
-            variant="success"
+            variant="secondary"
             @click="toggleDir()"
           >
             <span v-html="sortAsc ? '&darr;' : '&uarr;'"/>
@@ -114,7 +114,7 @@
             </b-button-toolbar>
           
 
-            <div class="d-block mt-3 text-secondary small">
+            <div class="d-block mt-3 text-muted small">
               Created {{ list.created | formatDate }}.
               {{ list.games && list.games.length > 0 ? list.games.length : 'No' }} unranked games.
               {{ 
