@@ -73,14 +73,14 @@ const state = {
 
     vbln: {
       text: "Invisible only",
-      details: "Invisible games do not appear in the default view. They may or may " +
-        "not be rankable.",
+      details: "Invisible games do not appear in the default view. They may or may not be rankab" +
+          "le.",
       getter: "visibleGames"
     },
     rbln: {
       text: "Unrankable only",
-      details: "Unrankable games do not appear in the default view, and are not " +
-        "considered as candidates for your list(s).",
+      details: "Unrankable games do not appear in the default view, and are not considered as ca" +
+          "ndidates for your list(s).",
       getter: "rankableGames"
     },
     all: {
@@ -110,14 +110,18 @@ const getters = {
   },
 
   getList: state => id => {
-    return state.lists.find(list => {
-      return id == list.id;
-    });
+    return state
+      .lists
+      .find(list => {
+        return id == list.id;
+      });
   },
   activePCF: state => {
-    return state.activeFilters.some(f => {
-      return f.indexOf("pcf") >= 0;
-    });
+    return state
+      .activeFilters
+      .some(f => {
+        return f.indexOf("pcf") >= 0;
+      });
   },
   getUseImgComparisons: state => {
     return state.useImgComparisons;
@@ -141,39 +145,38 @@ const getters = {
     return state.view;
   },
   games: (state, getters) => {
-    if (getters.currentView == "all") return state.games;
+    if (getters.currentView == "all") 
+      return state.games;
     return getters[state.views[getters.currentView].getter];
   },
   allGames: state => {
     return state.games;
   },
   filteredGames: state => {
-    return state.games.filter(game => {
-      let show = true;
-      state.activeFilters.forEach(filter => {
-        if (filter.substr(0, 3) === "pcf") {
-          // player count filter
-          let pcfArgs = filter.split("-");
-          if (pcfArgs.length < 3) {
-            // includes mode
-            show =
-              game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[1];
-          } else {
-            show =
-              game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[2];
-          }
-        } else {
-          if (
-            game[filter] !== state.filters[filter].test &&
-            (typeof state.filters[filter].test != "number" ||
-              game[filter] < state.filters[filter].test)
-          ) {
-            show = false;
-          }
-        }
+    return state
+      .games
+      .filter(game => {
+        let show = true;
+        state
+          .activeFilters
+          .forEach(filter => {
+            if (filter.substr(0, 3) === "pcf") {
+              // player count filter
+              let pcfArgs = filter.split("-");
+              if (pcfArgs.length < 3) {
+                // includes mode
+                show = game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[1];
+              } else {
+                show = game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[2];
+              }
+            } else {
+              if (game[filter] !== state.filters[filter].test && (typeof state.filters[filter].test != "number" || game[filter] < state.filters[filter].test)) {
+                show = false;
+              }
+            }
+          });
+        return show;
       });
-      return show;
-    });
   },
   viewObj: (state, getters) => {
     return state.views[getters.currentView];
@@ -185,20 +188,26 @@ const getters = {
     return state.views;
   },
   visibleGames: (state, getters) => {
-    return getters.filteredGames.filter(game => {
-      return game.visible == !(state.view.charAt(3) == "n");
-    });
+    return getters
+      .filteredGames
+      .filter(game => {
+        return game.visible == !(state.view.charAt(3) == "n");
+      });
   },
 
   rankableGames: (state, getters) => {
-    return getters.filteredGames.filter(game => {
-      return game.rankable == !(state.view.charAt(3) == "n");
-    });
+    return getters
+      .filteredGames
+      .filter(game => {
+        return game.rankable == !(state.view.charAt(3) == "n");
+      });
   },
   rvGames: (state, getters) => {
-    return getters.rankableGames.filter(game => {
-      return game.visible == !(state.view.charAt(3) == "n");
-    });
+    return getters
+      .rankableGames
+      .filter(game => {
+        return game.visible == !(state.view.charAt(3) == "n");
+      });
   },
   preImportGames: state => {
     return state.preImportGames;
@@ -213,15 +222,19 @@ const getters = {
     return Object.keys(state.toggleables);
   },
   getProp: state => (id, prop) => {
-    let g = state.games.find(game => {
-      return game.gameId == id;
-    });
+    let g = state
+      .games
+      .find(game => {
+        return game.gameId == id;
+      });
     return g[prop];
   },
   getGame: state => id => {
-    return state.games.find(game => {
-      return game.gameId == id;
-    });
+    return state
+      .games
+      .find(game => {
+        return game.gameId == id;
+      });
   }
 };
 
@@ -231,9 +244,7 @@ const actions = {
   }, data) {
     commit("loadFromFile", data)
   },
-  setIntroduced({
-    commit
-  }) {
+  setIntroduced({commit}) {
     commit("setIntroducedMutation");
   },
   setUseImgComparisons({
@@ -255,17 +266,12 @@ const actions = {
     commit,
     getters,
     dispatch
-  }, {
-    listid,
-    newName
-  }) {
+  }, {listid, newName}) {
     commit("renameList", {
       list: getters.getList(listid),
       newName
     });
-    dispatch("listUpdated", {
-      listid
-    });
+    dispatch("listUpdated", {listid});
   },
   /**
    * Sets the rank of game in list to given rank, clearing any prior ranking.
@@ -279,29 +285,17 @@ const actions = {
     commit,
     dispatch,
     getters
-  }, {
-    listid,
-    game,
-    rank
-  }) {
+  }, {listid, game, rank}) {
     let list = getters.getList(listid);
-    let currentRank = list.list.indexOf(game);
-    if (currentRank >= 0)
-      commit("unrank", {
-        list,
-        game,
-        rank: currentRank
-      });
+    let currentRank = list
+      .list
+      .indexOf(game);
+    if (currentRank >= 0) 
+      commit("unrank", {list, game, rank: currentRank});
     if (rank >= 0) {
-      commit("setRank", {
-        list,
-        rank,
-        game
-      });
+      commit("setRank", {list, rank, game});
     }
-    dispatch("listUpdated", {
-      listid
-    });
+    dispatch("listUpdated", {listid});
   },
   /**
    *
@@ -337,29 +331,37 @@ const actions = {
         });
     });
   },
+  importGames({
+    commit
+  }, {mode}) {
+    commit(mode);
+
+  },
   makeNewList({
     state,
     getters,
     commit
-  }, {
-    name
-  }) {
-    state.lists.sort((a, b) => {
-      return a.id - b.id;
-    });
+  }, {name}) {
+    state
+      .lists
+      .sort((a, b) => {
+        return a.id - b.id;
+      });
     let nextId = state.lists.length;
     for (let i = 0; i < nextId; i++) {
       if (i < state.lists[i].id) {
         nextId = i;
       }
     }
-    let ids = getters.rankableGames.map(game => game.gameId);
+    let ids = getters
+      .rankableGames
+      .map(game => game.gameId);
     commit("newList", {
       name: name,
-      games: ids
-        .map(a => [Math.random(), a])
-        .sort((a, b) => a[0] - b[0])
-        .map(a => a[1]),
+      games: ids.map(a => [
+        Math.random(),
+        a
+      ]).sort((a, b) => a[0] - b[0]).map(a => a[1]),
       created: Date.now(),
       modified: Date.now(),
       id: nextId,
@@ -376,20 +378,13 @@ const actions = {
     commit,
     dispatch,
     getters
-  }, {
-    listid,
-    game
-  }) {
+  }, {listid, game}) {
     let list = getters.getList(listid);
-    let index = list.games.indexOf(game);
-    commit("dropGameFromList", {
-      list,
-      index,
-      game
-    });
-    dispatch("listUpdated", {
-      listid
-    });
+    let index = list
+      .games
+      .indexOf(game);
+    commit("dropGameFromList", {list, index, game});
+    dispatch("listUpdated", {listid});
   },
   /**
    * Removes duplicates and updates date modified
@@ -401,14 +396,10 @@ const actions = {
   listUpdated({
     commit,
     getters
-  }, {
-    listid
-  }) {
+  }, {listid}) {
     let list = getters.getList(listid);
     // commit('dedupe', { list });
-    commit("modified", {
-      list
-    });
+    commit("modified", {list});
   }
 };
 
@@ -422,9 +413,7 @@ const mutations = {
    * @param {any} state
    * @param {any} { list }
    */
-  dedupe(state, {
-    list
-  }) {
+  dedupe(state, {list}) {
     list.list = _.uniq(list.list);
     list.games = _.uniq(list.games);
   },
@@ -435,17 +424,14 @@ const mutations = {
    * @param {any} state
    * @param {any} { list, index, game }
    */
-  dropGameFromList(state, {
-    list,
-    index,
-    game
-  }) {
-    if (list.games[index] == game) list.games.splice(index, 1);
-    else throw ReferenceError("Game is not at given index.");
-  },
-  modified(state, {
-    list
-  }) {
+  dropGameFromList(state, {list, index, game}) {
+    if (list.games[index] == game) 
+      list.games.splice(index, 1);
+    else 
+      throw ReferenceError("Game is not at given index.");
+    }
+  ,
+  modified(state, {list}) {
     list.modifed = Date.now();
   },
   /**
@@ -455,51 +441,54 @@ const mutations = {
    * @param {Number} rank   Rank to assign to game
    * @param {Number} game   ID number of game
    */
-  setRank(state, {
-    list,
-    rank,
-    game
-  }) {
-    list.list.splice(rank, 0, game);
+  setRank(state, {list, rank, game}) {
+    list
+      .list
+      .splice(rank, 0, game);
   },
-  unrank(state, {
-    list,
-    game,
-    rank
-  }) {
+  unrank(state, {list, game, rank}) {
     if (list.list[rank] === game) {
-      list.list.splice(rank, 1);
+      list
+        .list
+        .splice(rank, 1);
     } else {
       throw ReferenceError("Given game does not have given rank.");
     }
   },
   logRequest(state, req) {
-    state.requests.push(req);
+    state
+      .requests
+      .push(req);
   },
-  renameList(state, {
-    list,
-    newName
-  }) {
+  renameList(state, {list, newName}) {
     list.name = newName;
   },
   purgeLists(state) {
     state.lists = [];
   },
   deleteList(state, payload) {
-    state.lists = state.lists.filter(list => {
-      return list.id !== payload.id;
-    });
+    state.lists = state
+      .lists
+      .filter(list => {
+        return list.id !== payload.id;
+      });
   },
   newList(state, list) {
-    state.lists.push(list);
+    state
+      .lists
+      .push(list);
   },
   clearPCF(state) {
     // PCF = "player count filter"
-    let index = state.activeFilters.findIndex(f => {
-      return f.indexOf("pcf") >= 0;
-    });
+    let index = state
+      .activeFilters
+      .findIndex(f => {
+        return f.indexOf("pcf") >= 0;
+      });
     if (index >= 0) {
-      state.activeFilters.splice(index, 1);
+      state
+        .activeFilters
+        .splice(index, 1);
       return index;
     }
   },
@@ -513,12 +502,18 @@ const mutations = {
     state.perPage = n;
   },
   setFilter(state, f) {
-    let index = state.activeFilters.indexOf(f);
+    let index = state
+      .activeFilters
+      .indexOf(f);
     if (index >= 0) {
-      state.activeFilters.splice(index, 1);
+      state
+        .activeFilters
+        .splice(index, 1);
       return index;
     }
-    state.activeFilters.push(f);
+    state
+      .activeFilters
+      .push(f);
     return index;
   },
   setView(state, v) {
@@ -533,11 +528,7 @@ const mutations = {
    */
   importMerge(state) {
     let newSet = _.unionBy(state.games, state.preImportGames, "gameId");
-    let conflicts = _.intersectionBy(
-      state.preImportGames,
-      state.games,
-      "gameId"
-    );
+    let conflicts = _.intersectionBy(state.preImportGames, state.games, "gameId");
     conflicts.forEach(cgame => {
       newSet.find(ngame => {
         _.assign(ngame.ratings, cgame.ratings);
@@ -591,10 +582,11 @@ const mutations = {
    * @return {Void}           No return statement.
    */
   toggle(state, payload) {
-    state.games.find(game => {
+    state
+      .games
+      .find(game => {
         return game.gameId == payload.id;
-      })[payload.property] =
-      payload.value;
+      })[payload.property] = payload.value;
   }
 };
 
@@ -603,8 +595,7 @@ export default new Vuex.Store({
   getters,
   actions,
   mutations,
-  plugins: [
-    createPersistedState({
+  plugins: [createPersistedState({
       paths: [
         "introduced",
         "perPage",
@@ -615,6 +606,5 @@ export default new Vuex.Store({
         "lists",
         "useImgComparisons"
       ]
-    })
-  ]
+    })]
 });
