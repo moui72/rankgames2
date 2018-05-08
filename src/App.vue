@@ -253,7 +253,7 @@ export default {
   data() {
     return {
       title: "Rank Games 2",
-      version: "1.0.3",
+      version: "1.0.4",
       focus: false,
       fileName: "my-rg-data",
       error: "",
