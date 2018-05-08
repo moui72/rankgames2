@@ -14,9 +14,9 @@ const state = {
   lists: [],
   libraries: [],
   filters: {
-    rated: {
-      test: true,
-      text: "games I haven\'t",
+    rating: {
+      test: 0,
+      text: "games I haven\'t rated",
       simple: true
     },
     owned: {
@@ -165,6 +165,9 @@ const getters = {
         state
           .activeFilters
           .forEach(filter => {
+            console.log(filter)
+            console.log(game[filter])
+
             if (filter.substr(0, 3) === "pcf") {
               // player count filter
               let pcfArgs = filter.split("-");
@@ -176,7 +179,13 @@ const getters = {
                 show = game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[2];
               }
             } else {
-              if (game[filter] !== state.filters[filter].test && (typeof state.filters[filter].test != "number" || game[filter] < state.filters[filter].test)) {
+              if (
+                game[filter] !== state.filters[filter].test &&
+                (
+                  typeof state.filters[filter].test != "number" ||
+                  game[filter] < state.filters[filter].test
+                )
+              ) {
                 show = false;
               }
             }

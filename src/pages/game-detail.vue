@@ -98,7 +98,7 @@
               <span class="sr-only">close "{{ game.name }}" details screen</span>
             </b-btn>
           </div>
-
+          <b-btn @click="dump">DUMP</b-btn>
         </b-button-group>
       </div>
     </b-card>
@@ -119,7 +119,6 @@ export default {
   computed: {
     ...mapGetters(["toggles", "getProp", "getGame"]),
     game() {
-      console.log(this.getGame(this.id));
       return this.getGame(this.id);
     },
     id() {
@@ -141,6 +140,9 @@ export default {
     }
   },
   methods: {
+    dump() {
+      console.log(this.game);
+    },
     close() {
       this.$router.back();
     },
