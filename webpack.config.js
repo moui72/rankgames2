@@ -1,6 +1,8 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const WebpackAutoInject = require('webpack-auto-inject-version');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/main.js',
@@ -10,8 +12,7 @@ module.exports = {
     filename: 'build.js'
   },
   module: {
-    rules: [
-      {
+    rules: [{
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
@@ -53,12 +54,23 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
-    noInfo: true
+    noInfo: true,
+    openPage: 'dist'
   },
   performance: {
     hints: false
   },
-  plugins: [new ExtractTextPlugin('main.css')],
+  plugins: [
+    new HtmlWebpackPlugin({
+      hash: true,
+      title: 'Rank Games 2',
+      version: '[AIV]{version}[/AIV]',
+      template: './src/index.html'
+
+    }),
+    new WebpackAutoInject(),
+    new ExtractTextPlugin('main.css')
+  ],
   devtool: '#eval-source-map'
 };
 
