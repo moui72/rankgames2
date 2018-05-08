@@ -10,17 +10,22 @@ const state = {
   useImgComparisons: true,
   backgroundLoad: false,
   perPage: 24,
-  activeFilters: [],
+  activeFilters: ['isExpansion'],
   lists: [],
   libraries: [],
   filters: {
+    rated: {
+      test: true,
+      text: "games I haven\'t",
+      simple: true
+    },
     owned: {
       test: true,
       text: "games I don't own",
       simple: true
     },
     isExpansion: {
-      test: true,
+      test: false,
       text: "expansions",
       simple: true
     },
@@ -74,13 +79,13 @@ const state = {
     vbln: {
       text: "Invisible only",
       details: "Invisible games do not appear in the default view. They may or may not be rankab" +
-          "le.",
+        "le.",
       getter: "visibleGames"
     },
     rbln: {
       text: "Unrankable only",
       details: "Unrankable games do not appear in the default view, and are not considered as ca" +
-          "ndidates for your list(s).",
+        "ndidates for your list(s).",
       getter: "rankableGames"
     },
     all: {
@@ -145,7 +150,7 @@ const getters = {
     return state.view;
   },
   games: (state, getters) => {
-    if (getters.currentView == "all") 
+    if (getters.currentView == "all")
       return state.games;
     return getters[state.views[getters.currentView].getter];
   },
@@ -164,7 +169,7 @@ const getters = {
               // player count filter
               let pcfArgs = filter.split("-");
               if (pcfArgs.length < 3) {
-                // player count includes
+                // player count includes 
                 show = game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[1];
               } else {
                 // player count ranges
@@ -245,7 +250,9 @@ const actions = {
   }, data) {
     commit("loadFromFile", data)
   },
-  setIntroduced({commit}) {
+  setIntroduced({
+    commit
+  }) {
     commit("setIntroducedMutation");
   },
   setUseImgComparisons({
@@ -267,12 +274,17 @@ const actions = {
     commit,
     getters,
     dispatch
-  }, {listid, newName}) {
+  }, {
+    listid,
+    newName
+  }) {
     commit("renameList", {
       list: getters.getList(listid),
       newName
     });
-    dispatch("listUpdated", {listid});
+    dispatch("listUpdated", {
+      listid
+    });
   },
   /**
    * Sets the rank of game in list to given rank, clearing any prior ranking.
@@ -286,17 +298,31 @@ const actions = {
     commit,
     dispatch,
     getters
-  }, {listid, game, rank}) {
+  }, {
+    listid,
+    game,
+    rank
+  }) {
     let list = getters.getList(listid);
     let currentRank = list
       .list
       .indexOf(game);
-    if (currentRank >= 0) 
-      commit("unrank", {list, game, rank: currentRank});
+    if (currentRank >= 0)
+      commit("unrank", {
+        list,
+        game,
+        rank: currentRank
+      });
     if (rank >= 0) {
-      commit("setRank", {list, rank, game});
+      commit("setRank", {
+        list,
+        rank,
+        game
+      });
     }
-    dispatch("listUpdated", {listid});
+    dispatch("listUpdated", {
+      listid
+    });
   },
   /**
    *
@@ -334,7 +360,9 @@ const actions = {
   },
   importGames({
     commit
-  }, {mode}) {
+  }, {
+    mode
+  }) {
     commit(mode);
 
   },
@@ -342,7 +370,9 @@ const actions = {
     state,
     getters,
     commit
-  }, {name}) {
+  }, {
+    name
+  }) {
     state
       .lists
       .sort((a, b) => {
@@ -379,13 +409,22 @@ const actions = {
     commit,
     dispatch,
     getters
-  }, {listid, game}) {
+  }, {
+    listid,
+    game
+  }) {
     let list = getters.getList(listid);
     let index = list
       .games
       .indexOf(game);
-    commit("dropGameFromList", {list, index, game});
-    dispatch("listUpdated", {listid});
+    commit("dropGameFromList", {
+      list,
+      index,
+      game
+    });
+    dispatch("listUpdated", {
+      listid
+    });
   },
   /**
    * Removes duplicates and updates date modified
@@ -397,10 +436,14 @@ const actions = {
   listUpdated({
     commit,
     getters
-  }, {listid}) {
+  }, {
+    listid
+  }) {
     let list = getters.getList(listid);
     // commit('dedupe', { list });
-    commit("modified", {list});
+    commit("modified", {
+      list
+    });
   }
 };
 
@@ -414,7 +457,9 @@ const mutations = {
    * @param {any} state
    * @param {any} { list }
    */
-  dedupe(state, {list}) {
+  dedupe(state, {
+    list
+  }) {
     list.list = _.uniq(list.list);
     list.games = _.uniq(list.games);
   },
@@ -425,14 +470,19 @@ const mutations = {
    * @param {any} state
    * @param {any} { list, index, game }
    */
-  dropGameFromList(state, {list, index, game}) {
-    if (list.games[index] == game) 
+  dropGameFromList(state, {
+    list,
+    index,
+    game
+  }) {
+    if (list.games[index] == game)
       list.games.splice(index, 1);
-    else 
+    else
       throw ReferenceError("Game is not at given index.");
-    }
-  ,
-  modified(state, {list}) {
+  },
+  modified(state, {
+    list
+  }) {
     list.modifed = Date.now();
   },
   /**
@@ -442,12 +492,20 @@ const mutations = {
    * @param {Number} rank   Rank to assign to game
    * @param {Number} game   ID number of game
    */
-  setRank(state, {list, rank, game}) {
+  setRank(state, {
+    list,
+    rank,
+    game
+  }) {
     list
       .list
       .splice(rank, 0, game);
   },
-  unrank(state, {list, game, rank}) {
+  unrank(state, {
+    list,
+    game,
+    rank
+  }) {
     if (list.list[rank] === game) {
       list
         .list
@@ -461,7 +519,10 @@ const mutations = {
       .requests
       .push(req);
   },
-  renameList(state, {list, newName}) {
+  renameList(state, {
+    list,
+    newName
+  }) {
     list.name = newName;
   },
   purgeLists(state) {
@@ -597,15 +658,15 @@ export default new Vuex.Store({
   actions,
   mutations,
   plugins: [createPersistedState({
-      paths: [
-        "introduced",
-        "perPage",
-        "activeFilters",
-        "requests",
-        "games",
-        "view",
-        "lists",
-        "useImgComparisons"
-      ]
-    })]
+    paths: [
+      "introduced",
+      "perPage",
+      "activeFilters",
+      "requests",
+      "games",
+      "view",
+      "lists",
+      "useImgComparisons"
+    ]
+  })]
 });
