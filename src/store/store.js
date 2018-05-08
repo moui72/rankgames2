@@ -20,7 +20,7 @@ const state = {
       simple: true
     },
     isExpansion: {
-      test: false,
+      test: true,
       text: "expansions",
       simple: true
     },
@@ -164,9 +164,10 @@ const getters = {
               // player count filter
               let pcfArgs = filter.split("-");
               if (pcfArgs.length < 3) {
-                // includes mode
+                // player count includes
                 show = game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[1];
               } else {
+                // player count ranges
                 show = game.minPlayers <= pcfArgs[1] && game.maxPlayers >= pcfArgs[2];
               }
             } else {
