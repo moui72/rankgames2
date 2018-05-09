@@ -368,6 +368,8 @@ $font-family-sans-serif: "Abel", "Helvetica", "Tahoma", "-apple-system",
   sans-serif;
 $font-family-serif: "Bitter", "Times New Roman", serif;
 $font-family-title: "Teko", "Helvetica", "Tahoma", sans-serif;
+$sans: $font-family-sans-serif;
+$serif: $font-family-serif;
 body,
 html {
   background-color: #ccc;

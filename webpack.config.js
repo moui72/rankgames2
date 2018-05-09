@@ -8,8 +8,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
+    path: path.resolve(__dirname, './rankgames2'),
+    publicPath: '/rankgames2/',
     filename: '[name].[hash].js'
   },
   module: {
@@ -56,7 +56,7 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     noInfo: true,
-    openPage: 'dist'
+    openPage: './rankgames2/'
   },
   performance: {
     hints: false
@@ -67,7 +67,6 @@ module.exports = {
       hash: true,
       title: 'Rank Games 2',
       template: './src/index.html',
-      version: '[AIV]{version}[/AIV]',
       SILENT: true
     }),
     new WebpackAutoInject(),

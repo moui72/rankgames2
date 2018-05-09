@@ -6,9 +6,9 @@
     "private": true,
     "scripts": {
         "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-        "build": "cross-env NODE_ENV=production webpack --progress --hide-modules --env.patch",
-        "deploy": "scp -r dist/* aso:www/rankgames2/",
-        "patch": "npm shrink && npm run build && npm run deploy",
+        "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+        "deploy": "scp -r ./rankgames2 aso:www/",
+        "patch": "npm shrink && cross-env NODE_ENV=production webpack --progress --hide-modules --env.patch && npm run deploy",
         "minor": "npm shrink && cross-env NODE_ENV=production webpack --progress --hide-modules --env.minor && npm run deploy",
         "major": "npm shrink && cross-env NODE_ENV=production webpack --progress --hide-modules --env.major && npm run deploy"
     },

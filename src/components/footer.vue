@@ -60,6 +60,7 @@ export default {
 <style lang="scss">
 .rg-footer {
   .btn {
+    font-family: "Bitter", "Times New Roman", serif;
     font-size: 0.7rem;
     .fa-icon {
       color: #036;
