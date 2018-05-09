@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const WebpackAutoInject = require('webpack-auto-inject-version');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -9,7 +10,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
-    filename: 'build.js'
+    filename: '[name].[hash].js'
   },
   module: {
     rules: [{
@@ -61,12 +62,13 @@ module.exports = {
     hints: false
   },
   plugins: [
+    new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       hash: true,
       title: 'Rank Games 2',
+      template: './src/index.html',
       version: '[AIV]{version}[/AIV]',
-      template: './src/index.html'
-
+      SILENT: true
     }),
     new WebpackAutoInject(),
     new ExtractTextPlugin('main.css')

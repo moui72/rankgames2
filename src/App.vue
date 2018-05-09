@@ -351,6 +351,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import url(https://cdn.jsdelivr.net/npm/animate.css@3.5.1);
 $theme-colors: (
   "primary": #0033a7,
   "danger": #ff4136,
