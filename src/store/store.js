@@ -346,7 +346,7 @@ const actions = {
       if (!username.length) {
         reject("No username provided.");
       }
-      let request = "http://rankgames.ty-pe.com/bggapi/?username=" + username;
+      let request = "http://rankgames.ty-pe.com/bggapi/?username=" + encodeURI(username);
       commit("logRequest", request);
       axios
         .get(request)
