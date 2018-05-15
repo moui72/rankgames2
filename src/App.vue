@@ -11,7 +11,7 @@
         class="brand">
         <img 
           :alt="title" 
-          src="rg-logo-ico.png"
+          src="img/rg-logo-ico.png"
           height="50px"
         >
         <span class="ml-2">{{ title }}</span>

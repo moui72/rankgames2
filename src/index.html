@@ -3,16 +3,46 @@
 
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <meta name="charset" content="utf-8">
+    <meta name="charset" content="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="css/fontello.css?c=13245949358475893475983" />
+    <link rel="stylesheet" href="css/animation.css" />
     <title>
       <%= htmlWebpackPlugin.options.title %> @ [AIV]{version}[/AIV]
     </title>
+    <style>
+      .loading {
+        text-align: center;
+        height: 100vh;
+        width: 100vw;
+        background-color: #0d1e46;
+        color: #ffffff;
+        font-family: "Tahoma", sans-serif;
+      }
+
+      .loading img {
+        height: 50vh;
+        margin-top: 10vh;
+      }
+
+      .loading i {
+        font-size: 5em;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="app">
+
+      <div class="loading">
+        <img src="img/logo.png" alt="Rank Games 2">
+        <div>
+          <i class=" icon icon-spinner1 animate-spin"></i>
+          <p>The app is loading.</p>
+        </div>
+      </div>
+    </div>
   </body>
 
 </html>
