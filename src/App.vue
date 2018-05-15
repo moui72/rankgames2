@@ -9,7 +9,12 @@
       <b-navbar-brand 
         to="/" 
         class="brand">
-        {{ title }}
+        <img 
+          :alt="title" 
+          src="rg-logo-ico.png"
+          height="50px"
+        >
+        <span class="ml-2">{{ title }}</span>
       </b-navbar-brand>
       <span class="version mr-2">
         <small>v{{ version }}</small>
@@ -389,9 +394,8 @@ h6 {
 }
 .brand {
   font-family: $font-family-title;
-  font-size: 2rem;
   color: theme-color("brand") !important;
-  text-shadow: 2px 2px 5px #000;
+  font-size: 1.5rem;
 }
 .shadow {
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
