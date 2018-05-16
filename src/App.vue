@@ -44,7 +44,7 @@
               aria-hidden 
               label="download icon" 
               scale=".95"/>
-            <span>Export</span>
+            <span>Save to file</span>
           </b-nav-item>
           <b-nav-item to="/lib">
             <icon 
@@ -179,7 +179,7 @@
     >
       <b-form-group
         label="Filename" 
-        description="Enter a name for the export file. Do not include a file 
+        description="Enter a name for the save file. Do not include a file 
         extension. The data are json, so the file will be a .json file."
       >
         <p 
@@ -202,7 +202,7 @@
     >
       <b-form-group
         label="Load from file" 
-        description="Select a previously exported file to load into the app."
+        description="Select a previously saved file to load into the app."
       >
         <p 
           class="text-info"
@@ -218,7 +218,7 @@
         <b-form-file 
           v-model="file"
           type="file"
-          accept="application/json" 
+          accept="application/json, text/plain" 
         />
 
       </b-form-group>
@@ -291,45 +291,96 @@ export default {
       "loadSavedData"
     ]),
     preloadData() {
-      if (!this.file || this.file.type !== "application/json") {
+      if (
+        !this.file ||
+        (this.file.type !== "application/json" &&
+          this.file.type !== "text/plain")
+      ) {
         this.error = "Invalid file type.";
         return;
       }
+
       let reader = new FileReader();
-      var vm = this;
-      var preload = null;
+      const VM = this;
 
       reader.onload = function() {
+        let prev = "";
+        let preload;
+
         try {
           preload = JSON.parse(reader.result);
+          console.log(preload);
         } catch (e) {
-          vm.error = "Failed to parse JSON (" + e + ").";
+          VM.error = "Failed to parse JSON (" + e + ").";
           console.error(e);
           return e;
         }
+
+        if (
+          Array.isArray(preload) &&
+          preload.some(member => member.gameId > 0)
+        ) {
+          preload = {
+            games: preload,
+            lists: [],
+            exported: VM.file.lastModified
+          };
+          prev +=
+            "Legacy save file with " +
+            preload.games.length +
+            " games detected and no lists.";
+          VM.preview = prev;
+        }
+
+        if (preload.hasOwnProperty("set")) {
+          prev +=
+            "Legacy save file with a list of " +
+            preload.rankedSet.length +
+            " ranked games and";
+          preload.set.length + " games detected.";
+          preload = {
+            games: preload.set,
+            lists: [
+              {
+                name: preload.name,
+                games: preload.set
+                  .map(a => [Math.random(), a])
+                  .sort((a, b) => a[0] - b[0])
+                  .map(a => a[1]),
+                created: this.file.lastModified,
+                modified: preload.lastEdit,
+                list: preload.rankedSet
+              }
+            ]
+          };
+          VM.preview = prev;
+        }
+
         if (!preload.games && !preload.lists) {
-          vm.error = "File is invalid.";
+          VM.error = "File is invalid.";
           return;
         }
-        let prev = "";
-        prev += "Saved " + preload.exported + ". ";
-        prev +=
-          "File contains collection of " +
-          (!!preload.games && preload.games.length > 0
-            ? preload.games.length + " games "
-            : "no games. ");
-        prev +=
-          !!preload.lists && preload.lists.length > 0
-            ? "as well as " + preload.lists.length + " lists."
-            : "but no lists.";
-        vm.error = "";
-        vm.preview = prev;
-        vm.preloadedData = preload;
+
+        if (!VM.preview) {
+          prev += "Saved " + preload.exported + ". ";
+          prev +=
+            "File contains collection of " +
+            (!!preload.games && preload.games.length > 0
+              ? preload.games.length + " games "
+              : "no games. ");
+          prev +=
+            !!preload.lists && preload.lists.length > 0
+              ? "as well as " + preload.lists.length + " lists."
+              : "but no lists.";
+          VM.preview = prev;
+        }
+
+        VM.error = "";
+        VM.preloadedData = preload;
         return preload;
       };
       reader.readAsText(this.file);
     },
-    loadData() {},
     saveData(bvtEvt) {
       if (!/^[a-z0-9_.@()-]+$/i.test(this.fileName)) {
         bvtEvt.preventDefault();
@@ -358,14 +409,15 @@ export default {
 <style lang="scss">
 @import url(https://cdn.jsdelivr.net/npm/animate.css@3.5.1);
 $theme-colors: (
-  "primary": #0033a7,
+  "primary": #0d1e46,
   "danger": #ff4136,
-  "secondary": rgb(180, 90, 200),
+  "secondary": #0033a7,
+  "purple": rgb(180, 90, 200),
   "other": #12580c,
   "info": rgb(220, 100, 180),
   "brand": rgb(255, 255, 155)
 );
-$body-bg: "#ccc";
+$body-bg: #cccccc;
 @import url("https://fonts.googleapis.com/css?family=Abel|Bitter|Teko");
 
 @import "node_modules/bootstrap/scss/bootstrap";
@@ -425,7 +477,7 @@ h6 {
 
 .version {
   font-family: $font-family-serif;
-  background-color: lighten(theme-color("secondary"), 10%);
+  background-color: lighten(theme-color("purple"), 10%);
   color: theme-color("black");
   padding: 0.25rem;
   font-size: 0.7rem;

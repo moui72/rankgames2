@@ -165,8 +165,6 @@ const getters = {
         state
           .activeFilters
           .forEach(filter => {
-            console.log(filter)
-            console.log(game[filter])
 
             if (filter.substr(0, 3) === "pcf") {
               // player count filter
@@ -209,7 +207,6 @@ const getters = {
         return game.visible == !(state.view.charAt(3) == "n");
       });
   },
-
   rankableGames: (state, getters) => {
     return getters
       .filteredGames
@@ -223,9 +220,6 @@ const getters = {
       .filter(game => {
         return game.visible == !(state.view.charAt(3) == "n");
       });
-  },
-  preImportGames: state => {
-    return state.preImportGames;
   },
   newGames: state => {
     return _.differenceBy(state.preImportGames, state.games, "gameId");
@@ -257,7 +251,7 @@ const actions = {
   loadSavedData({
     commit
   }, data) {
-    commit("loadFromFile", data)
+    commit("preprocessCollection", data.games);
   },
   setIntroduced({
     commit
@@ -616,6 +610,8 @@ const mutations = {
     state.preImportGames = [];
   },
   loadFromFile(state, payload) {
+    console.log('loadFromFile')
+    console.log(payload)
     state.games = payload.games;
     state.lists = payload.lists;
   },
@@ -632,7 +628,15 @@ const mutations = {
     collection = _.uniqBy(collection, "gameId");
     let prepdCollection = _.map(collection, game => {
       let g = {
-        ...state.toggleables,
+        ...() => {
+          let exists = false;
+          for (const toggle in state.toggleables) {
+            if (typeof game[toggle] == "boolean") {
+              exists = true
+            }
+          }
+          return exists ? null : state.toggleables;
+        },
         ...game,
         user: user
       };
@@ -641,6 +645,8 @@ const mutations = {
       return g;
     });
     state.preImportGames = prepdCollection;
+    console.log('prep')
+    console.log(state.preImportGames)
   },
   /**
    * Mutates the value of a game's toggleable property
