@@ -197,18 +197,20 @@
 
     <b-modal 
       id="load" 
-      title="Load data from"
-      @ok="loadSavedData(preloadedData)"
+      title="Load data from file"
+      ok-only
+      ok-title="Close"
     >
+      <p 
+        class="text-info"
+      >
+        {{ preview }}
+      </p>
       <b-form-group
+        v-if="preloadedData.games.length < 1 && preloadedData.lists.length < 1"
         label="Load from file" 
         description="Select a previously saved file to load into the app."
       >
-        <p 
-          class="text-info"
-        >
-          {{ preview }}
-        </p>
         <p 
           v-show="error.length > 0" 
           class="text-danger"
@@ -225,6 +227,10 @@
       <p 
         v-show="!!file && !error" 
         class="text-warning">Be warned that clicking OK will overwrite your current data. You may want to export the current data first.
+      </p>
+      <p v-if="preloadedData.games.length > 0">
+        <b-button>Overwrite</b-button>
+        <b-button>Cancel</b-button>
       </p>
     </b-modal>
 
@@ -277,8 +283,8 @@ export default {
     ])
   },
   watch: {
-    file: function() {
-      this.preloadData();
+    file: function(oldval, newval) {
+      if (oldval != newval) this.preloadData();
     }
   },
   methods: {
@@ -323,7 +329,8 @@ export default {
           preload = {
             games: preload,
             lists: [],
-            exported: VM.file.lastModified
+            exported: VM.file.lastModified,
+            user: VM.file.name
           };
           prev +=
             "Legacy save file with " +
@@ -347,11 +354,12 @@ export default {
                   .map(a => [Math.random(), a])
                   .sort((a, b) => a[0] - b[0])
                   .map(a => a[1]),
-                created: this.file.lastModified,
+                created: VM.file.lastModified,
                 modified: preload.lastEdit,
                 list: preload.rankedSet
               }
-            ]
+            ],
+            user: VM.file.name
           };
           VM.preview = prev;
         }
@@ -373,7 +381,18 @@ export default {
               ? "as well as " + preload.lists.length + " lists."
               : "but no lists.";
           VM.preview = prev;
+        } else {
+          for (let game of preload.games) {
+            if (typeof game["visible"] == "undefined") {
+              game["visible"] = true;
+            }
+            if (typeof game["rankable"] == "undefined") {
+              game["rankable"] = true;
+            }
+          }
         }
+
+        preload.user = preload.user || VM.file.name;
 
         VM.error = "";
         VM.preloadedData = preload;

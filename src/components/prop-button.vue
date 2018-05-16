@@ -84,23 +84,8 @@ export default {
       return this.texts[this.property][this.value];
     }
   },
-  created() {
-    if (
-      this.id > 0 &&
-      typeof this.getProp(this.id, this.property) == "undefined"
-    ) {
-      console.log(
-        "Toggleable property of " +
-          this.id +
-          " not set; setting " +
-          this.property +
-          " to true."
-      );
-      this.setProp({ id: this.id, property: this.property });
-    }
-  },
   methods: {
-    ...mapActions(["toggleProp", "setProp"])
+    ...mapActions(["toggleProp"])
   }
 };
 </script>

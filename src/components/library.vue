@@ -271,7 +271,7 @@ import PropButton from "./prop-button.vue";
 import Import from "./import.vue";
 import Filters from "./filters.vue";
 import Icon from "vue-awesome";
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapActions } from "vuex";
 
 export default {
   name: "Library",
@@ -306,12 +306,14 @@ export default {
       return this.viewObj.details;
     }
   },
+  created() {},
   methods: {
+    ...mapMutations(["setView", "setFilter", "clearPCF", "makeNewList"]),
+    ...mapActions(["setProp"]),
     toggleLegend() {
       console.log("toggle", this.showLegend);
       this.showLegend = !this.showLegend;
     },
-    ...mapMutations(["setView", "setFilter", "clearPCF", "makeNewList"]),
     makeList(name) {
       let listId = this.makeNewList({ name });
       this.$router.go("/list/" + listId);

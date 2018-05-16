@@ -107,7 +107,8 @@ const getters = {
     return JSON.stringify({
       games: state.games,
       lists: state.lists,
-      exported: Date.now()
+      exported: Date.now(),
+      user: state.games[0].user
     })
   },
   dump: state => {
@@ -263,8 +264,12 @@ const actions = {
     id,
     property
   }) {
-    console.log('action id')
-    console.log(id, property)
+    if (typeof id == 'undefined' || id < 1)
+      throw new RangeError('Invalid game ID')
+
+    if (typeof property == 'undefined')
+      throw new RangeError('Invalid property name')
+
     commit("setNewProp", {
       game: getters.getGame(id),
       property
@@ -654,7 +659,7 @@ const mutations = {
    * @return {void}                 no return value
    */
   preprocessCollection(state, collection) {
-    let user = collection.user;
+    let user = collection.user || 'my save file';
     collection = _.uniqBy(collection, "gameId");
     let prepdCollection = _.map(collection, game => {
       let g = {
@@ -675,8 +680,6 @@ const mutations = {
       return g;
     });
     state.preImportGames = prepdCollection;
-    console.log('prep')
-    console.log(state.preImportGames)
   },
   /**
    * Mutates the value of a game's toggleable property
