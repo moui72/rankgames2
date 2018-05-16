@@ -5,7 +5,7 @@
       :variant="variant"
       :title="desc"
       class="prop-btn"
-      @click="toggle({
+      @click="toggleProp({
         property: property,
         value: !value,
         id: id
@@ -29,14 +29,14 @@ import "vue-awesome/icons/toggle-on";
 import "vue-awesome/icons/toggle-off";
 
 import Icon from "vue-awesome";
-import { mapMutations, mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "PropButton",
   components: { Icon },
   props: {
     property: { type: String, required: true },
-    value: { type: Boolean, required: true },
+    value: { type: Boolean, default: true },
     id: { type: Number, default: 0 },
     size: { type: String, default: "sm" },
     disabled: { type: Boolean, default: false }
@@ -70,10 +70,10 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["propertyObj", "getProp"]),
     desc() {
       return this.propertyObj(this.property).details;
     },
-    ...mapGetters(["propertyObj"]),
     icon() {
       return this.icons[this.property][this.value];
     },
@@ -84,11 +84,25 @@ export default {
       return this.texts[this.property][this.value];
     }
   },
+  created() {
+    if (
+      this.id > 0 &&
+      typeof this.getProp(this.id, this.property) == "undefined"
+    ) {
+      console.log(
+        "Toggleable property of " +
+          this.id +
+          " not set; setting " +
+          this.property +
+          " to true."
+      );
+      this.setProp({ id: this.id, property: this.property });
+    }
+  },
   methods: {
-    ...mapMutations(["toggle"])
+    ...mapActions(["toggleProp", "setProp"])
   }
 };
 </script>
 <style lang="scss">
-
 </style>

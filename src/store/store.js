@@ -97,6 +97,9 @@ const state = {
 };
 
 const getters = {
+  preImportGames: state => {
+    return state.preImportGames;
+  },
   wasIntroduced: state => {
     return state.introduced;
   },
@@ -248,6 +251,25 @@ const getters = {
 };
 
 const actions = {
+  toggleProp({
+    commit
+  }, payload) {
+    commit("toggle", payload);
+  },
+  setProp({
+    commit,
+    getters
+  }, {
+    id,
+    property
+  }) {
+    console.log('action id')
+    console.log(id, property)
+    commit("setNewProp", {
+      game: getters.getGame(id),
+      property
+    });
+  },
   loadSavedData({
     commit
   }, data) {
@@ -451,6 +473,14 @@ const actions = {
 };
 
 const mutations = {
+  setNewProp(state, {
+    game,
+    property
+  }) {
+    console.log('game', game)
+    console.log('prop', property)
+    Vue.set(game, property, true);
+  },
   setIntroducedMutation(state) {
     state.introduced = !state.introduced;
   },
