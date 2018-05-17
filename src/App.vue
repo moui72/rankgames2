@@ -226,11 +226,12 @@
       </b-form-group>
       <p 
         v-show="!!file && !error" 
-        class="text-warning">Be warned that clicking OK will overwrite your current data. You may want to export the current data first.
+        class="text-warning">Be warned that clicking overwrite will overwrite your current data. You may want to export the current data first.
       </p>
       <p v-if="preloadedData.games.length > 0">
-        <b-button>Overwrite</b-button>
-        <b-button>Cancel</b-button>
+        <b-button @click="doLoad(true)">Overwrite</b-button>
+        <b-button @click="doLoad(false)">Merge</b-button>
+        <b-button @click="cancelLoad()">Cancel</b-button>
       </p>
     </b-modal>
 
@@ -294,8 +295,25 @@ export default {
       "setUseImgComparisons",
       "setBackgroundLoad",
       "setIntroduced",
-      "loadSavedData"
+      "loadSavedData",
+      "importReplace"
     ]),
+    doLoad(overwrite = false) {
+      if (overwrite) {
+        this.$store.commit("importReplace");
+      } else {
+        this.$store.commit("importMerge");
+      }
+      this.$store.commit("pushLists", this.preloadedData.lists);
+      this.clearLoad();
+    },
+    cancelLoad() {
+      this.$store.commit("importCancel");
+      this.clearLoad();
+    },
+    clearLoad() {
+      this.preloadedData = { games: [], lists: [], exported: Date.now() };
+    },
     preloadData() {
       if (
         !this.file ||
