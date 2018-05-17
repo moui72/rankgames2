@@ -1,7 +1,7 @@
 <template>
   <div>
     <div 
-      v-if="!allGames.length < 1" 
+      v-if="allGames.length < 1" 
       class="my-3 widget"
     >
       <h2>First time here?</h2>

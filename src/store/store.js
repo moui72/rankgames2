@@ -577,6 +577,7 @@ const mutations = {
     state.preImportGames = [];
   },
   importReplace(state) {
+    console.log('importReplace')
     state.games = state.preImportGames;
     state.preImportGames = [];
   },

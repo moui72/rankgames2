@@ -197,6 +197,7 @@
 
     <b-modal 
       id="load" 
+      ref="loadModal"
       title="Load data from file"
       ok-only
       ok-title="Close"
@@ -299,6 +300,7 @@ export default {
       "importReplace"
     ]),
     doLoad(overwrite = false) {
+      console.log("doLoad");
       if (overwrite) {
         this.$store.commit("importReplace");
       } else {
@@ -306,6 +308,7 @@ export default {
       }
       this.$store.commit("pushLists", this.preloadedData.lists);
       this.clearLoad();
+      this.$refs.loadModal.hide();
     },
     cancelLoad() {
       this.$store.commit("importCancel");
@@ -313,110 +316,126 @@ export default {
     },
     clearLoad() {
       this.preloadedData = { games: [], lists: [], exported: Date.now() };
+      this.preview = "";
     },
     preloadData() {
-      if (
-        !this.file ||
-        (this.file.type !== "application/json" &&
-          this.file.type !== "text/plain")
-      ) {
-        this.error = "Invalid file type.";
-        return;
-      }
-
-      let reader = new FileReader();
-      const VM = this;
-
-      reader.onload = function() {
-        let prev = "";
-        let preload;
-
-        try {
-          preload = JSON.parse(reader.result);
-          console.log(preload);
-        } catch (e) {
-          VM.error = "Failed to parse JSON (" + e + ").";
-          console.error(e);
-          return e;
-        }
-
+      let load = new Promise((resolve, reject) => {
         if (
-          Array.isArray(preload) &&
-          preload.some(member => member.gameId > 0)
+          !this.file ||
+          (this.file.type !== "application/json" &&
+            this.file.type !== "text/plain")
         ) {
-          preload = {
-            games: preload,
-            lists: [],
-            exported: VM.file.lastModified,
-            user: VM.file.name
-          };
-          prev +=
-            "Legacy save file with " +
-            preload.games.length +
-            " games detected and no lists.";
-          VM.preview = prev;
+          this.error = "Invalid file type.";
+          return reject(this.error);
         }
 
-        if (preload.hasOwnProperty("set")) {
-          prev +=
-            "Legacy save file with a list of " +
-            preload.rankedSet.length +
-            " ranked games and";
-          preload.set.length + " games detected.";
-          preload = {
-            games: preload.set,
-            lists: [
-              {
-                name: preload.name,
-                games: preload.set
-                  .map(a => [Math.random(), a])
-                  .sort((a, b) => a[0] - b[0])
-                  .map(a => a[1]),
-                created: VM.file.lastModified,
-                modified: preload.lastEdit,
-                list: preload.rankedSet
+        let reader = new FileReader();
+        const VM = this;
+
+        reader.onload = function() {
+          let prev = "";
+          let preload;
+
+          try {
+            preload = JSON.parse(reader.result);
+          } catch (e) {
+            VM.error = "Failed to parse JSON (" + e + ").";
+            console.error(e);
+            return reject(e);
+          }
+
+          if (
+            Array.isArray(preload) &&
+            preload.some(member => member.gameId > 0)
+          ) {
+            preload = {
+              games: preload,
+              lists: [],
+              exported: VM.file.lastModified,
+              user: VM.file.name
+            };
+            prev +=
+              "Legacy save file with " +
+              preload.games.length +
+              " games detected and no lists.";
+            VM.preview = prev;
+          }
+
+          if (
+            (preload.hasOwnProperty("set") ||
+              preload.hasOwnProperty("rankedSet")) &&
+            (preload.set.length > 0 || preload.rankedSet.length > 0)
+          ) {
+            prev +=
+              "Legacy save file with a list of " +
+              preload.rankedSet.length +
+              " ranked games and " +
+              preload.set.length +
+              " games detected.";
+            preload = {
+              games: preload.set,
+              lists: [
+                {
+                  name: preload.name,
+                  games: preload.set
+                    .map(a => [Math.random(), a])
+                    .sort((a, b) => a[0] - b[0])
+                    .map(a => a[1]),
+                  created: VM.file.lastModified,
+                  modified: preload.lastEdit,
+                  list: preload.rankedSet
+                }
+              ],
+              user: VM.file.name
+            };
+            VM.preview = prev;
+          }
+
+          if (!preload.games && !preload.lists) {
+            VM.error = "File is invalid.";
+            return reject(VM.error);
+          }
+
+          if (!VM.preview) {
+            prev += "Saved " + preload.exported + ". ";
+            prev +=
+              "File contains collection of " +
+              (!!preload.games && preload.games.length > 0
+                ? preload.games.length + " games "
+                : "no games. ");
+            prev +=
+              !!preload.lists && preload.lists.length > 0
+                ? "as well as " + preload.lists.length + " lists."
+                : "but no lists.";
+            VM.preview = prev;
+          } else {
+            for (let game of preload.games) {
+              if (typeof game["visible"] == "undefined") {
+                game["visible"] = true;
               }
-            ],
-            user: VM.file.name
-          };
-          VM.preview = prev;
-        }
-
-        if (!preload.games && !preload.lists) {
-          VM.error = "File is invalid.";
-          return;
-        }
-
-        if (!VM.preview) {
-          prev += "Saved " + preload.exported + ". ";
-          prev +=
-            "File contains collection of " +
-            (!!preload.games && preload.games.length > 0
-              ? preload.games.length + " games "
-              : "no games. ");
-          prev +=
-            !!preload.lists && preload.lists.length > 0
-              ? "as well as " + preload.lists.length + " lists."
-              : "but no lists.";
-          VM.preview = prev;
-        } else {
-          for (let game of preload.games) {
-            if (typeof game["visible"] == "undefined") {
-              game["visible"] = true;
-            }
-            if (typeof game["rankable"] == "undefined") {
-              game["rankable"] = true;
+              if (typeof game["rankable"] == "undefined") {
+                game["rankable"] = true;
+              }
             }
           }
-        }
 
-        preload.user = preload.user || VM.file.name;
+          preload.user = preload.user || VM.file.name;
 
-        VM.error = "";
-        VM.preloadedData = preload;
-        return preload;
-      };
-      reader.readAsText(this.file);
+          VM.error = "";
+          VM.preloadedData = preload;
+          resolve(preload);
+          return preload;
+        };
+        reader.readAsText(this.file);
+      });
+      load
+        .then(data => {
+          console.log("prep");
+          this.loadSavedData(data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
     saveData(bvtEvt) {
       if (!/^[a-z0-9_.@()-]+$/i.test(this.fileName)) {
