@@ -3,6 +3,7 @@ node_modules/
 dist/
 npm-debug.log
 yarn-error.log
+rankgames2/
 
 # Editor directories and files
 .idea
