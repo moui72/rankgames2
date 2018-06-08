@@ -121,7 +121,7 @@ export default {
       return this.ids.length > 0;
     },
     pages() {
-      if (this.ids) {
+      if (this.ranking) {
         return Math.ceil(this.ids.length / this.perPage);
       }
       return Math.ceil(this.games.length / this.perPage);

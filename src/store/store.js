@@ -155,7 +155,7 @@ const getters = {
   },
   games: (state, getters) => {
     if (getters.currentView == "all") 
-      return state.games;
+      return getters.allGames;
     return getters[state.views[getters.currentView].getter];
   },
   allGames: state => {
@@ -435,8 +435,6 @@ const actions = {
 
 const mutations = {
   setNewProp(state, {game, property}) {
-    console.log('game', game)
-    console.log('prop', property)
     Vue.set(game, property, true);
   },
   setIntroducedMutation(state) {
@@ -580,7 +578,6 @@ const mutations = {
     state.preImportGames = [];
   },
   importReplace(state) {
-    console.log('importReplace')
     state.games = state.preImportGames;
     state.preImportGames = [];
   },

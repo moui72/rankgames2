@@ -21,7 +21,7 @@
       <!-- header -->
       <b-row>
         <b-col>
-          <h2>Library
+          <h2>Library ({{ allGames.length }} total)
             <span class="small text-primary">
               <span v-html="'&raquo'"/> {{ viewObj.text }}
             </span>
@@ -182,14 +182,10 @@
           {{ showLegend ? '- hide' : '+ show' }} legend
         </b-btn>
       </div>
-
     </div>
-
 
     <!-- games browser -->
     <games-browser/>
-
-
 
     <!-- MODALS -->
     <!-- import -->
