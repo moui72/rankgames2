@@ -105,7 +105,7 @@ const getters = {
   },
   export: state => {
     return JSON.stringify({
-      games: state.games,
+      games: state.games, 
       lists: state.lists,
       exported: Date.now(),
       user: state.games[0].user
@@ -572,6 +572,8 @@ const mutations = {
     conflicts.forEach(cgame => {
       newSet.find(ngame => {
         _.assign(ngame.ratings, cgame.ratings);
+        _.assign(ngame.visible, cgame.visible);
+        _.assign(ngame.rankable, cgame.rankable);
       });
     });
     state.games = newSet;
@@ -596,23 +598,13 @@ const mutations = {
   preprocessCollection(state, collection) {
     let user = collection.user || 'my save file';
     collection = _.uniqBy(collection, "gameId");
-    let prepdCollection = _.map(collection, game => {
+    let prepdCollection = collection.map(game => {
       let g = {
-        ...() => {
-          let exists = false;
-          for (const toggle in state.toggleables) {
-            if (typeof game[toggle] == "boolean") {
-              exists = true
-            }
-          }
-          return exists
-            ? null
-            : state.toggleables;
-        },
+        ...state.toggleables,
         ...game,
-        user: user
+        user: user,
+        ratings: {}
       };
-      g["ratings"] = {};
       g["ratings"][g.user] = g.rating;
       return g;
     });
