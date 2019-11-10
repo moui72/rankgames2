@@ -8,17 +8,13 @@
     ok-title="Close"
     ok-variant="warning"
   >
-    <b-alert 
-      :show="message.length" 
-      :variant="alertType">
-      {{ message }}
-    </b-alert>
-    <spinner v-show="loading"/>
-    <div 
-      v-show="!loading"
-      @keyup.enter="fetch()">
+    <b-alert :show="message.length" 
+:variant="alertType">{{ message }}</b-alert>
+    <spinner v-show="loading" />
+    <div v-show="!loading" 
+@keyup.enter="fetch()">
       <div v-show="preImportGames.length < 1">
-        <b-form-group 
+        <b-form-group
           label="Import from BGG"
           description="Enter the BGG username attached to the collection you want to import. If you import another collection subsequently, any new games in that collection will be added."
         >
@@ -27,21 +23,18 @@
             v-model="username"
             type="text"
             name="username"
-            placeholder="BGG Username" />
+            placeholder="BGG Username"
+          />
         </b-form-group>
-        <b-button 
-          variant="primary" 
-          @click="fetch()">
-          <icon 
-            name="download" 
-            aria-hidden/> Import
-        </b-button >
+        <b-button variant="primary" 
+@click="fetch()">
+          <icon name="download" 
+aria-hidden />Import
+        </b-button>
       </div>
 
-      <div 
-        v-if="preImportGames.length > 0"
-        class="pre-import-games-list" 
-      >
+      <div v-if="preImportGames.length > 0" 
+class="pre-import-games-list">
         <h3>Found {{ preImportGames.length }} unique games</h3>
         <p>
           You may either merge these games into your existing collection
@@ -51,26 +44,14 @@
           If you want to discard the just imported games and start over, click
           cancel.
         </p>
-        <p>
-          Games that would be added if merged: {{ newGames.length }}.
-        </p>
-        <p>
-          Games that would be dropped if replaced: {{ droppedGames.length }}.
-        </p>
-        <b-button 
-          variant="info"
-          @click="merge()" 
-        >
-          Merge
-        </b-button>
-        <b-button 
-          variant="danger"
-          @click="replace()" 
-        >Replace</b-button>
-        <b-button 
-          variant="warning"
-          @click="cancel()" 
-        >Cancel</b-button>
+        <p>Games that would be added if merged: {{ newGames.length }}.</p>
+        <p>Games that would be dropped if replaced: {{ droppedGames.length }}.</p>
+        <b-button variant="info" 
+@click="merge()">Merge</b-button>
+        <b-button variant="danger" 
+@click="replace()">Replace</b-button>
+        <b-button variant="warning" 
+@click="cancel()">Cancel</b-button>
       </div>
     </div>
   </b-modal>
@@ -145,8 +126,6 @@ export default {
           message = error;
           this.alertType = "warning";
           if (error.includes("queued")) {
-            // @TODO update user on retry
-            //
             if (this.attempts < this.maxAttempts) {
               message += " Retry #" + this.attempts + ".";
               let ref = this;
@@ -155,9 +134,7 @@ export default {
                 ref.fetch(true);
               }, 2000);
             } else {
-              message = `Request still queued after ${
-                this.attempts
-              } attempts. Server likely under heavy load. Please try again later.`;
+              message = `Request still queued after ${this.attempts} attempts. Server likely under heavy load. Please try again later.`;
               this.report(message);
               this.alertType = "warning";
               this.loading = false;

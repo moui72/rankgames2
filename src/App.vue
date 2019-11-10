@@ -1,125 +1,59 @@
 <template>
   <div id="app">
-    <b-navbar 
-      class="sans"
-      toggleable="md" 
-      variant="primary" 
-      type="dark">
-      <b-navbar-toggle target="nav_dropdown_collapse"/>
-      <b-navbar-brand 
-        to="/" 
-        class="brand">
-        <img 
-          :alt="title" 
-          src="img/rg-logo-ico.png"
-          height="50px"
-        >
+    <b-navbar class="sans" toggleable="md" variant="primary" type="dark">
+      <b-navbar-toggle target="nav_dropdown_collapse" />
+      <b-navbar-brand to="/" class="brand">
+        <img :alt="title" src="img/rg-logo-ico.png" height="50px" />
         <span class="ml-2">{{ title }}</span>
       </b-navbar-brand>
       <span class="version mr-2">
         <small>v{{ version }}</small>
       </span>
-      <b-collapse 
-        id="nav_dropdown_collapse"
-        is-nav 
-      >
+      <b-collapse id="nav_dropdown_collapse" is-nav>
         <b-navbar-nav class="mr-auto">
-          <b-nav-item
-            v-b-modal="'load'" 
-          
-          >
-            <icon 
-              name="upload" 
-              aria-hidden 
-              label="upload icon" 
-              scale=".95"/>
+          <b-nav-item v-b-modal="'load'">
+            <icon name="upload" aria-hidden label="upload icon" scale=".95" />
             <span>Load from file</span>
           </b-nav-item>
-          <b-nav-item
-            v-b-modal="'export'" 
-          
-          >
-            <icon 
-              name="download" 
-              aria-hidden 
-              label="download icon" 
-              scale=".95"/>
+          <b-nav-item v-b-modal="'export'">
+            <icon name="download" aria-hidden label="download icon" scale=".95" />
             <span>Save to file</span>
           </b-nav-item>
           <b-nav-item to="/lib">
-            <icon 
-              name="book" 
-              aria-hidden 
-              label="book icon" 
-              scale=".95"/>
+            <icon name="book" aria-hidden label="book icon" scale=".95" />
             <span>Library</span>
           </b-nav-item>
           <b-nav-item to="/">
-            <icon 
-              name="home" 
-              aria-hidden 
-              label="home icon" 
-              scale=".95"/>
+            <icon name="home" aria-hidden label="home icon" scale=".95" />
             <span>Home</span>
           </b-nav-item>
           <b-nav-item to="/lists">
-            <icon 
-              name="list" 
-              aria-hidden 
-              label="lists icon" 
-              scale=".95"/>
+            <icon name="list" aria-hidden label="lists icon" scale=".95" />
             <span>Lists</span>
           </b-nav-item>
-          <b-nav-item 
-            v-b-modal="'settings'" 
-            title="settings">
-            <icon 
-              name="cog" 
-              aria-hidden 
-              label="settings icon" 
-              scale=".95"/>
+          <b-nav-item v-b-modal="'settings'" title="settings">
+            <icon name="cog" aria-hidden label="settings icon" scale=".95" />
             <span>Settings</span>
           </b-nav-item>
         </b-navbar-nav>
-        <b-navbar-nav 
-          v-if="!isHome()" 
-          class="float-right">
+        <b-navbar-nav v-if="!isHome()" class="float-right">
           <b-nav-item @click="back">
-            <span v-html="'&larr;'"/> Back
+            <span v-html="'&larr;'" /> Back
           </b-nav-item>
         </b-navbar-nav>
       </b-collapse>
-
     </b-navbar>
 
-    <b-modal
-      id="settings"
-      title="Settings"
-      ok-title="Close"
-      ok-variant="primary"
-      ok-only
-    >
+    <b-modal id="settings" title="Settings" ok-title="Close" ok-variant="primary" ok-only>
       <b-form-group
         label="Show welcome message"
         description="If you want the welcome message to show on the homepage again, click this box."
       >
-        <b-form-checkbox 
-          :checked="!wasIntroduced"
-          @change="setIntroduced"
-        > 
-          Show welcome message
-        </b-form-checkbox>
+        <b-form-checkbox :checked="!wasIntroduced" @change="setIntroduced">Show welcome message</b-form-checkbox>
       </b-form-group>
-      <div
-        class="form-group"
-      >
-        <legend 
-          for="sel" 
-          class="col-form-label pt-0"
-        >
-          Games per page
-        </legend>
-        <select 
+      <div class="form-group">
+        <legend for="sel" class="col-form-label pt-0">Games per page</legend>
+        <select
           id="sel"
           class="form-control"
           aria-describedby="perPageDescription"
@@ -127,17 +61,12 @@
         >
           <option
             v-for="n in 9"
-            :selected="n * 12 == getPerPage" 
-            :value="n*12" 
+            :selected="n * 12 == getPerPage"
+            :value="n*12"
             :key="n"
-          >
-            {{ n * 12 }} items
-          </option>
+          >{{ n * 12 }} items</option>
         </select>
-        <small 
-          id="perPageDescription" 
-          class="form-text text-muted"
-        >
+        <small id="perPageDescription" class="form-text text-muted">
           How many games to show on each page.
           Lower values may provide better performance.
         </small>
@@ -148,12 +77,10 @@
         load times, but will degrade the sighted user's experience to some 
         extent."
       >
-        <b-form-checkbox 
+        <b-form-checkbox
           :checked="getUseImgComparisons"
           @change="setUseImgComparisons"
-        > 
-          Use images in comparisons 
-        </b-form-checkbox>
+        >Use images in comparisons</b-form-checkbox>
       </b-form-group>
       <b-form-group
         label="Background loading"
@@ -161,74 +88,39 @@
         waiting for images to cache. Images will not be shown until they are 
         done loading. This setting requires that images are turned on."
       >
-        <b-form-checkbox 
+        <b-form-checkbox
           :checked="getBackgroundLoad && getUseImgComparisons"
           :disabled="!getUseImgComparisons"
           @change="setBackgroundLoad"
-        > 
-          Load images in background
-        </b-form-checkbox>
+        >Load images in background</b-form-checkbox>
       </b-form-group>
     </b-modal>
 
-    <b-modal 
-      id="export" 
-      title="Export data"
-      @ok="saveData"
-      
-    >
+    <b-modal id="export" title="Export data" @ok="saveData">
       <b-form-group
-        label="Filename" 
+        label="Filename"
         description="Enter a name for the save file. Do not include a file 
         extension. The data are json, so the file will be a .json file."
       >
-        <p 
-          v-show="error.length > 0" 
-          class="text-danger"
-        >
-          {{ error }}
-        </p>
-        <b-input 
-          v-model="fileName"
-          type="text" 
-        />
+        <p v-show="error.length > 0" class="text-danger">{{ error }}</p>
+        <b-input v-model="fileName" type="text" />
       </b-form-group>
     </b-modal>
 
-    <b-modal 
-      id="load" 
-      ref="loadModal"
-      title="Load data from file"
-      ok-only
-      ok-title="Close"
-    >
-      <p 
-        class="text-info"
-      >
-        {{ preview }}
-      </p>
+    <b-modal id="load" ref="loadModal" title="Load data from file" ok-only ok-title="Close">
+      <p class="text-info">{{ preview }}</p>
       <b-form-group
         v-if="preloadedData.games.length < 1 && preloadedData.lists.length < 1"
-        label="Load from file" 
+        label="Load from file"
         description="Select a previously saved file to load into the app."
       >
-        <p 
-          v-show="error.length > 0" 
-          class="text-danger"
-        >
-          {{ error }}
-        </p>
-        <b-form-file 
-          v-model="file"
-          type="file"
-          accept="application/json, text/plain" 
-        />
-
+        <p v-show="error.length > 0" class="text-danger">{{ error }}</p>
+        <b-form-file v-model="file" type="file" accept="application/json, text/plain" />
       </b-form-group>
-      <p 
-        v-show="!!file && !error" 
-        class="text-warning">Be warned that clicking overwrite will overwrite your current data. You may want to export the current data first.
-      </p>
+      <p
+        v-show="!!file && !error"
+        class="text-warning"
+      >Be warned that clicking overwrite will overwrite your current data. You may want to export the current data first.</p>
       <p v-if="preloadedData.games.length > 0">
         <b-button @click="doLoad(true)">Overwrite</b-button>
         <b-button @click="doLoad(false)">Merge</b-button>
@@ -244,9 +136,8 @@
       enter-active-class="animated slideInUp"
       leave-active-class="animated slideOutDown"
     >
-      <router-view class="container-fluid"/>
+      <router-view class="container-fluid" />
     </transition>
-
   </div>
 </template>
 
