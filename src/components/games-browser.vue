@@ -14,12 +14,12 @@
     />
     <!-- games list -->
     <div v-if="list.length">
-      <transition-group 
+      <transition-group
         :duration="{enter: 300, leave: 200}"
         tag="div"
         name="game-list"
         appear
-        move-class="move" 
+        move-class="move"
         mode="out-in"
         enter-active-class="animated bounceIn"
         leave-active-class="animated zoomOut"
@@ -31,48 +31,25 @@
             :key="game.gameId"
             class="col-6 col-sm-4 col-md-3 col-lg-2 game-wrap"
           >
-            <div 
-              v-if="ranking" 
-              slot="controls">
-              <b-btn 
-                size="sm" 
-                variant="primary" 
-                @click="setrank(game.gameId)">
-                <icon 
-                  name="angle-double-up" 
-                  aria-hidden/>
+            <div v-if="ranking" slot="controls">
+              <b-btn size="sm" variant="primary" @click="setrank(game.gameId)">
+                <icon name="angle-double-up" aria-hidden />
                 <span class="sr-only">set rank</span>
               </b-btn>
-              <b-btn 
-                size="sm" 
-                variant="danger" 
-                @click="dropgame(game.gameId)">
-                <icon 
-                  name="close" 
-                  aria-hidden/>
+              <b-btn size="sm" variant="danger" @click="dropgame(game.gameId)">
+                <icon name="close" aria-hidden />
                 <span class="sr-only">drop game</span>
               </b-btn>
-              <b-btn 
-                :to="'/game/'+game.gameId"
-                size="sm" 
-                variant="info" 
-              >
-                <icon 
-                  name="info-circle" 
-                  aria-hidden/>
+              <b-btn :to="'/game/'+game.gameId" size="sm" variant="info">
+                <icon name="info-circle" aria-hidden />
                 <span class="sr-only">view details for {{ game.name }}</span>
               </b-btn>
             </div>
           </game>
         </template>
       </transition-group>
-        
     </div>
-    <div 
-      v-show="list.length < 1"
-      class="row my-1 widget container-fluid mx-auto">
-      No games.
-    </div>
+    <div v-show="list.length < 1" class="row my-1 widget container-fluid mx-auto">No games.</div>
     <!-- bottom pager -->
     <page-controls
       v-show="pages > 1"
@@ -82,7 +59,8 @@
       class="widget mb-1"
       @pageChange="setPage"
       @next="nextPage"
-      @prev="prevPage"/>
+      @prev="prevPage"
+    />
   </div>
 </template>
 
@@ -113,22 +91,29 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["games", "rankableGames", "getGame"]),
     ...mapGetters({
+      games: "games",
+      rankableGames: "rankableGames",
+      getGame: "getGame",
       perPage: "getPerPage"
     }),
     ranking() {
       return this.ids.length > 0;
     },
     pages() {
+      let pages = 1;
       if (this.ranking) {
-        return Math.ceil(this.ids.length / this.perPage);
+        pages = Math.ceil(this.ids.length / this.perPage);
       }
-      return Math.ceil(this.games.length / this.perPage);
+      pages = Math.ceil(this.games.length / this.perPage);
+      if (isNaN(pages)) {
+        pages = 1;
+      }
+      return pages;
     },
     list() {
       let games = [];
-      if (this.ids.length) {
+      if (this.ids.length > 0) {
         games = this.ids.map(game => this.getGame(game));
       } else {
         games = this.games;
