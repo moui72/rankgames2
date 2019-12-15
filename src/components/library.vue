@@ -210,7 +210,7 @@ export default {
       this.showLegend = !this.showLegend;
     },
     makeList(name) {
-      let listId = this.makeNewList({ name });
+      const listId = this.makeNewList({ name });
       this.$router.go("/list/" + listId);
     },
     setMode(index) {
