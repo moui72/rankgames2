@@ -1,16 +1,13 @@
 <template>
-  <div :class="{gc: true, left: left, right: !left}">
+  <div :class="{ gc: true, left: left, right: !left }">
     <img
       v-if="useImage"
       :alt="'Image of box cover for ' + name"
       :src="image"
       class="border-primary bgimg"
       height="400"
-    >
-    <div 
-      v-else 
-      class="spacer"
     />
+    <div v-else class="spacer" />
     <h2 class="name">{{ name }}</h2>
   </div>
 </template>
@@ -63,6 +60,7 @@ export default {
   border-radius: 0.2rem;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 
   &:hover {
     background-color: #396;

@@ -349,6 +349,7 @@ const actions = {
       id: nextId,
       list: []
     });
+    return nextId;
   },
   /**
    *

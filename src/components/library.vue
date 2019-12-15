@@ -4,7 +4,13 @@
       <h2>First time here?</h2>
       <p>
         Your collection is empty.
-        <b-btn v-b-modal="'import'" is="a" href="#" variant="link" v-html="'Import'" />some games to get started.
+        <b-btn
+          v-b-modal="'import'"
+          is="a"
+          href="#"
+          variant="link"
+          v-html="'Import'"
+        />some games to get started.
       </p>
     </div>
     <div class="my-3 header widget">
@@ -38,18 +44,29 @@
                 :title="view.description"
                 :key="name"
                 @click="setView(name)"
-              >{{ view.text }}</b-dropdown-item>
+                >{{ view.text }}</b-dropdown-item
+              >
             </template>
           </b-dropdown>
           <b-dropdown text="Add a filter" variant="warning">
             <template v-for="(filter, name) in filters">
-              <b-dd-item v-if="filter.simple" :key="name" @click="setFilter(name)">
-                {{ activeFilters.indexOf(name) >= 0 ?
-                'Stop ignoring' : 'Ignore' }} {{ filter.text }}
+              <b-dd-item
+                v-if="filter.simple"
+                :key="name"
+                @click="setFilter(name)"
+              >
+                {{
+                  activeFilters.indexOf(name) >= 0 ? "Stop ignoring" : "Ignore"
+                }}
+                {{ filter.text }}
               </b-dd-item>
             </template>
-            <b-dd-item v-show="activePCF" @click="clearPCF">Stop filtering by player count</b-dd-item>
-            <b-dd-item v-b-modal="'playerCount'" v-show="!activePCF">Filter by player count</b-dd-item>
+            <b-dd-item v-show="activePCF" @click="clearPCF"
+              >Stop filtering by player count</b-dd-item
+            >
+            <b-dd-item v-b-modal="'playerCount'" v-show="!activePCF"
+              >Filter by player count</b-dd-item
+            >
           </b-dropdown>
         </b-button-group>
         <b-button-group>
@@ -58,11 +75,13 @@
       </b-button-toolbar>
 
       <p class="mt-3">
-        The current view determines which games are visible.
-        Currently visible: {{ viewObj.details }}
+        The current view determines which games are visible. Currently visible:
+        {{ viewObj.details }}
       </p>
 
-      <p class="mt-3">Filters will categorically remove games from the ones that are rankable.</p>
+      <p class="mt-3">
+        Filters will categorically remove games from the ones that are rankable.
+      </p>
 
       <p>
         Each game has several buttons associated with it. You can use these
@@ -75,16 +94,36 @@
         <h3 slot="header">Legend</h3>
         <b-list-group flush>
           <b-list-group-item>
-            <prop-button :value="true" :id="-1" :disabled="true" property="visible" />
+            <prop-button
+              :value="true"
+              :id="-1"
+              :disabled="true"
+              property="visible"
+            />
           </b-list-group-item>
           <b-list-group-item>
-            <prop-button :value="false" :id="-1" :disabled="true" property="visible" />
+            <prop-button
+              :value="false"
+              :id="-1"
+              :disabled="true"
+              property="visible"
+            />
           </b-list-group-item>
           <b-list-group-item>
-            <prop-button :value="true" :id="-1" :disabled="true" property="rankable" />
+            <prop-button
+              :value="true"
+              :id="-1"
+              :disabled="true"
+              property="rankable"
+            />
           </b-list-group-item>
           <b-list-group-item>
-            <prop-button :value="false" :id="-1" :disabled="true" property="rankable" />
+            <prop-button
+              :value="false"
+              :id="-1"
+              :disabled="true"
+              property="rankable"
+            />
           </b-list-group-item>
           <b-list-group-item>
             <b-btn variant="info" disabled @click="info(id)">
@@ -96,11 +135,9 @@
       </b-card>
 
       <div class="text-right" s>
-        <b-btn
-          ize="sm"
-          variant="link"
-          @click="toggleLegend()"
-        >{{ showLegend ? '- hide' : '+ show' }} legend</b-btn>
+        <b-btn ize="sm" variant="link" @click="toggleLegend()"
+          >{{ showLegend ? "- hide" : "+ show" }} legend</b-btn
+        >
       </div>
     </div>
 
@@ -111,8 +148,16 @@
     <!-- import -->
     <import />
     <!-- make a list -->
-    <b-modal id="makeList" title="Make a list" ok-title="Create" @ok="makeList(newListName)">
-      <p>Creating a list with a pool of {{ rankableGames.length }} rankable games.</p>
+    <b-modal
+      id="makeList"
+      title="Make a list"
+      ok-title="Create"
+      @ok="makeList(newListName, rankableGames)"
+    >
+      <p>
+        Creating a list with a pool of
+        {{ rankableGames.length }} rankable games.
+      </p>
       <b-form-group label="List name" description="A name for your list.">
         <b-form-input
           v-model="newListName"
@@ -203,15 +248,18 @@ export default {
   },
   created() {},
   methods: {
-    ...mapMutations(["setView", "setFilter", "clearPCF", "makeNewList"]),
-    ...mapActions(["setProp"]),
+    ...mapMutations(["setView", "setFilter", "clearPCF"]),
+    ...mapActions(["setProp", "makeNewList"]),
     toggleLegend() {
       console.log("toggle", this.showLegend);
       this.showLegend = !this.showLegend;
     },
     makeList(name) {
-      const listId = this.makeNewList({ name });
-      this.$router.go("/list/" + listId);
+      const listId = this.makeNewList({ name }).then(id => {
+        console.log(listId);
+        console.log(id);
+        this.$router.push("/list/" + id);
+      });
     },
     setMode(index) {
       this.playerCountMode = index == 0 ? "includes" : "range";

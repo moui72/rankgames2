@@ -3,8 +3,13 @@
     <div class="container-fluid my-3 header widget">
       <div class="row">
         <div class="col-1 text-center">
-          <b-btn variant="info" @click="editName()" @keyup.esc="cancelRename">
-            <icon v-show="!editingName" name="pencil" aria-hidden />
+          <b-btn
+            v-show="!editingName"
+            variant="info"
+            @click="editName()"
+            @keyup.esc="cancelRename"
+          >
+            <icon name="pencil" aria-hidden />
             <span class="sr-only">rename</span>
           </b-btn>
           <b-btn
@@ -18,21 +23,28 @@
           </b-btn>
         </div>
         <div class="col-10">
-          <b-btn v-show="editingName" variant="info" @click="rename()" @keyup.esc="cancelRename()">
-            <icon v-show="!editingName" name="check" aria-hidden />
-            <span class="sr-only">confirm rename</span>
-          </b-btn>
-          <b-form-input
-            v-show="editingName"
-            ref="namefield"
-            :placeholder="listData.name"
-            v-model="newName"
-            size="lg"
-            type="text"
-            @blur.native="rename()"
-            @keyup.enter.native="rename()"
-            @keyup.esc.native="cancelRename()"
-          />
+          <b-input-group v-show="editingName">
+            <b-input-prepend>
+              <b-btn
+                variant="info"
+                @click="rename()"
+                @keyup.esc="cancelRename()"
+              >
+                <icon name="check" aria-hidden />
+                <span class="sr-only">confirm rename</span>
+              </b-btn>
+            </b-input-prepend>
+            <b-form-input
+              ref="namefield"
+              :placeholder="listData.name"
+              v-model="newName"
+              size="lg"
+              type="text"
+              @blur.native="rename()"
+              @keyup.enter.native="rename()"
+              @keyup.esc.native="cancelRename()"
+            />
+          </b-input-group>
           <h2 v-show="!editingName">
             <b-link to="/lists">Lists</b-link>
             <span v-html="'&raquo; '" />
@@ -64,22 +76,42 @@
       </div>
     </transition>
 
-    <div v-if="cached < listData.games.length && getUseImgComparisons" class="widget mt-3">
-      <h4>Preloading images ({{ cached }} of {{ ranked.length + unranked.length }})</h4>
+    <div
+      v-if="cached < listData.games.length && getUseImgComparisons"
+      class="widget mt-3"
+    >
+      <h4>
+        Preloading images ({{ cached }} of
+        {{ ranked.length + unranked.length }})
+      </h4>
       <h5>Buffer</h5>
-      <b-progress :value="cached" :max="bufferSize" variant="success" class="mb-3">
-        <b-progress-bar :value="Object.keys(imageCache).length">{{ cached }}</b-progress-bar>
+      <b-progress
+        :value="cached"
+        :max="bufferSize"
+        variant="success"
+        class="mb-3"
+      >
+        <b-progress-bar :value="Object.keys(imageCache).length">{{
+          cached
+        }}</b-progress-bar>
       </b-progress>
       <h5>Total</h5>
       <b-progress :max="listData.games.length">
-        <b-progress-bar :value="cached">{{ cached }} / {{ ranked.length + unranked.length }}</b-progress-bar>
+        <b-progress-bar :value="cached"
+          >{{ cached }} / {{ ranked.length + unranked.length }}</b-progress-bar
+        >
       </b-progress>
     </div>
 
     <ranked-games :list="listData.list" @setrank="setrank" />
     <!-- games browser -->
     <h3 class="base mt-3 p-3">Unranked games</h3>
-    <games-browser :ids="unranked" class="mb-3" @setrank="setrank" @dropgame="drop" />
+    <games-browser
+      :ids="unranked"
+      class="mb-3"
+      @setrank="setrank"
+      @dropgame="drop"
+    />
   </div>
 </template>
 
